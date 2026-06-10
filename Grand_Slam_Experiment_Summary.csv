@@ -1,0 +1,8 @@
+﻿推薦演算法 (Method),超參數設定 (Hyperparameters),MAE (↓),RMSE (↓),失效預測次數 (Failed Predictions),系統總評與學術定位 (Evaluation & Positioning)
+Matrix_Factorization (MF),Epoch = 100,0.8051,1.0288,9 次,【協同精準度之王】 密碼背誦能力極強，但無法解決冷啟動。
+Item_Hybrid ,K = 9,0.8546,1.0758,0 次 ,🌟 【全場綜合表現冠軍】 兼顧極高精準度與 100% 覆蓋率。
+Item_Content,K = 9,0.882,1.1036,0 次 ,純語義模型，雖不失效但精準度稍遜 Hybrid。
+Item_Rating,K = 9,0.8855,1.1389,9 次,純行為項目 CF，在稀疏矩陣與冷啟動下表現受限。
+User_Rating,K = 9,0.9344,1.1959,9 次,傳統 User-based CF，表現中規中矩。
+User_Hybrid,K = 7,0.939,1.2018,9 次,User 端混合特徵，精準度提升有限。
+User_Content,K = 9,1.0326,1.2769,9 次,純學生背景特徵，與學業成績關聯性較弱。
