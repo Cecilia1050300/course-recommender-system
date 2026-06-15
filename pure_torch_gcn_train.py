@@ -1,11 +1,13 @@
 """
 =============================================================================
-大學課程推薦系統 — 純血 PyTorch 版 GCN 訓練架構 (免 PyG 依賴防封鎖版)
+大學課程推薦系統 — 純血 PyTorch 版 GCN 訓練架構 (免 PyG 依賴防封鎖版 — 懲罰正則化升級版)
 =============================================================================
-學術創新亮點：
+學術創新與防過擬合亮點：
   1. 針對 Windows AppLocker/資安原則環境優化，完全剔除 PyG 外部 C++ 依賴。
   2. 使用純 PyTorch 矩陣張量算子，刻出經典 Thomas Kipf GCN 卷積層。
   3. 實作完整的反向傳播 (Backpropagation) 與 Adam 優化訓練迴圈。
+  4. 🔒 結構懲罰：在層與層之間導入 Dropout 機制，防止節點特徵過度平滑。
+  5. ⚖️ 參數懲罰：優化器掛載 Weight Decay (L2 正則化)，強力約束權重，對抗過擬合！
 =============================================================================
 """
 
@@ -56,7 +58,7 @@ def build_pure_torch_gcn_matrix(R_train):
     return torch.FloatTensor(W_hat_np)
 
 # =============================================================================
-# 2. 用純 PyTorch 刻出 GCNLayer 與 2-Layer 神經網路
+# 2. 用純 PyTorch 刻出 GCNLayer 與 2-Layer 神經網路 (內嵌 Dropout 結構懲罰)
 # =============================================================================
 
 class PureTorchGCNLayer(nn.Module):
@@ -84,8 +86,13 @@ class PureTorchGCNNet(nn.Module):
         self.gcn2 = PureTorchGCNLayer(hidden_dim, out_dim)
 
     def forward(self, W_hat):
-        # Layer 1 卷積 + ReLU 激活
-        h1 = F.relu(self.gcn1(self.X_initial, W_hat))
+        # Layer 1 卷積
+        h1 = self.gcn1(self.X_initial, W_hat)
+        h1 = F.relu(h1)
+        
+        # 🔒 結構懲罰：在層與層之間隨機隨機丟棄 10% 的特徵傳播，破壞過擬合路徑
+        h1 = F.dropout(h1, p=0.1, training=self.training)
+        
         # Layer 2 卷積 -> 得到終極節點 Embedding
         h2 = self.gcn2(h1, W_hat)
         return h2
@@ -134,16 +141,18 @@ if __name__ == "__main__":
     # 建立歸一化矩陣並轉為 PyTorch 張量
     W_hat_tensor = build_pure_torch_gcn_matrix(R_train)
     
-    # 宣告模型與 Adam 優化器
+    # 宣告模型
     model = PureTorchGCNNet(total_nodes=total_nodes, hidden_dim=12, out_dim=4)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    
+    # ⚖️ 參數懲罰升級：掛載 L2 正則化 (weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=1e-4)
     
     print("\n" + "="*60)
-    print("  🔥 啟動：純 PyTorch 自製版 GCN 權重反向傳播訓練迴圈")
+    print("  🔥 啟動：純 PyTorch 自製版 GCN (內嵌雙重正則化懲罰機制)")
     print("="*60)
     
     for epoch in range(1, 101):  # 跑 100 個 Epoch
-        model.train()
+        model.train()  # 啟動 Train 模式（啟用 Dropout）
         optimizer.zero_grad()
         
         # 前向傳播
@@ -169,26 +178,30 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
             
-        # 每 20 代觀測一次盲測指標是否下降（變聰明）
+        # 每 20 代觀測一次盲測指標是否下降
         if epoch % 20 == 0 or epoch == 1:
-            mae, rmse, _ = get_predictions_and_metrics(out_embeddings, M, N, R_train, R_truth)
+            model.eval()  # 💡 評估時必須切換成 eval 模式（關閉 Dropout，確保盲測公平）
+            with torch.no_grad():
+                val_embeddings = model(W_hat_tensor)
+                mae, rmse, _ = get_predictions_and_metrics(val_embeddings, M, N, R_train, R_truth)
             print(f"  Epoch {epoch:3d} | 訓練 Loss: {loss.item():.4f} | 盲測 MAE: {mae:.4f} | 盲測 RMSE: {rmse:.4f}")
 
     # 最終發榜
     model.eval()
-    final_embs = model(W_hat_tensor)
-    mae, rmse, final_ratings = get_predictions_and_metrics(final_embs, M, N, R_train, R_truth)
+    with torch.no_grad():
+        final_embs = model(W_hat_tensor)
+        mae, rmse, final_ratings = get_predictions_and_metrics(final_embs, M, N, R_train, R_truth)
     
     print("="*60)
-    print(f"  🏁 【純 PyTorch 訓練完成最終報告】")
-    print(f"  🏆 GCN 迭代優化後的真實 MAE  = {mae:.4f}")
-    print(f"  🏆 GCN 迭代優化後的真實 RMSE = {rmse:.4f}")
+    print(f"  🏁 【防過擬合版本 ─ 訓練完成最終報告】")
+    print(f"  🏆 GCN 加上正則化懲罰後的 MAE  = {mae:.4f}")
+    print(f"  🏆 GCN 加上正則化懲罰後的 RMSE = {rmse:.4f}")
     print("="*60)
     
     # 產出 Top-3 課程
     df_rec = pd.DataFrame({"課程代碼": item_ids, "評分": final_ratings, "已修": R_train[0]})
     df_rec = df_rec[df_rec["已修"] == 0].sort_values("評分", ascending=False).reset_index(drop=True)
-    print(f"  🎓 [純 PyTorch 推薦結果] 目標學生 U01 的 Top-3 課程：")
+    print(f"  🎓 [純 PyTorch + 懲罰機制推薦] 目標學生 U01 的 Top-3 課程：")
     for i in range(3):
         print(f"  第 {i+1} 名：{df_rec.loc[i, '課程代碼']:<10} 預測對齊分數: {df_rec.loc[i, '評分']:.4f} 分")
     print("="*60 + "\n")
