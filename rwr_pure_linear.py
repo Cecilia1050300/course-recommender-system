@@ -25,17 +25,54 @@ def build_adjacency_matrix(R: np.ndarray) -> np.ndarray:
     A[M:, :M] = R.T
     return A
 
-def get_transition_matrix(A: np.ndarray, strategy: str) -> np.ndarray:
+def get_transition_matrix(A: np.ndarray, strategy: str, temperature: float = 1.0) -> np.ndarray:
+    """
+    strategy 選項：
+      pure_binary  — 有邊=1，無邊=0，row normalize
+      pure_linear  — 原始分數按比例，row normalize  
+      softmax      — Softmax 正規化（老師指定）
+    
+    temperature：
+      < 1.0 → 更銳利，高分邊更突出（建議 0.5）
+      = 1.0 → 標準 Softmax
+      > 1.0 → 更平滑，接近 uniform
+    """
     if strategy == "pure_binary":
         W_base = np.where(A > 0, 1.0, 0.0)
+        row_sums = W_base.sum(axis=1, keepdims=True)
+        row_sums_safe = np.where(row_sums == 0, 1.0, row_sums)
+        return W_base / row_sums_safe
+
     elif strategy == "pure_linear":
         W_base = A.copy()
+        row_sums = W_base.sum(axis=1, keepdims=True)
+        row_sums_safe = np.where(row_sums == 0, 1.0, row_sums)
+        return W_base / row_sums_safe
+
+    elif strategy == "softmax":
+        # ── Softmax 正規化 ──────────────────────────────────────────────
+        # 只對「有邊的位置」做 Softmax，無邊的保持 0
+        # 否則 exp(0) = 1 會讓沒有評分的邊也獲得非零權重
+        
+        W = np.zeros_like(A, dtype=np.float64)
+        
+        for i in range(A.shape[0]):
+            nonzero_mask = A[i] > 0
+            if nonzero_mask.sum() == 0:
+                continue  # 孤立節點，保持全 0
+            
+            scores = A[i, nonzero_mask] / temperature   # 套用溫度縮放
+            
+            # 數值穩定：減掉最大值，防止 exp overflow
+            scores_stable = scores - scores.max()
+            exp_scores = np.exp(scores_stable)
+            
+            W[i, nonzero_mask] = exp_scores / exp_scores.sum()
+        
+        return W
+
     else:
-        raise ValueError("請選擇 pure_binary 或 pure_linear")
-    
-    row_sums = W_base.sum(axis=1, keepdims=True)
-    row_sums_safe = np.where(row_sums == 0, 1.0, row_sums)
-    return W_base / row_sums_safe
+        raise ValueError("請選擇 pure_binary、pure_linear 或 softmax")
 
 def run_rwr(W: np.ndarray, target_idx: int, c: float = 0.35, max_iter: int = 200) -> np.ndarray:
     """
@@ -143,38 +180,46 @@ if __name__ == "__main__":
     R_train, R_truth = load_benchmark_data("rating_matrix_train.csv", "rating_matrix_truth.csv")
     M, N = R_train.shape
     A = build_adjacency_matrix(R_train)
-    
-    print(f"\n資料集規模：{M} 學生 × {N} 課程")
-    print(f"評分密度：{(R_train > 0).mean():.1%}\n")
-    
+
     results = {}
-    
+
+    # 原本兩個策略
     for strategy_label, strategy_key in [
         ("Binary（忽略分數）",     "pure_binary"),
         ("Linear（原始分數比例）", "pure_linear"),
     ]:
         W = get_transition_matrix(A, strategy_key)
-        
-        # 先掃描最佳 c 值
         best_c = sweep_c_values(W, M, N, R_train, R_truth, strategy_label)
-        
-        # 用最佳 c 值做最終預測
         P = run_rwr(W, target_idx=0, c=best_c)
         mae, rmse, preds = evaluate_metrics(P, M, N, R_train, R_truth, use_log_smooth=True)
         results[strategy_label] = {"最佳 c": best_c, "MAE": mae, "RMSE": rmse, "盲測預測": preds}
-    
+
+    # ── 新增：Softmax 策略，掃描不同 temperature ──
+    print("\n[Softmax] Temperature 掃描：")
+    print(f"{'temperature':>12} | {'最佳 c':>6} | {'MAE':>8} | {'RMSE':>8}")
+    print("-" * 44)
+
+    best_softmax_mae = float('inf')
+    best_softmax_config = {}
+
+    for temp in [0.3, 0.5, 0.8, 1.0, 1.5, 2.0]:
+        W_sm = get_transition_matrix(A, "softmax", temperature=temp)
+        best_c = sweep_c_values(W_sm, M, N, R_train, R_truth, f"Softmax T={temp}")
+        P_sm = run_rwr(W_sm, target_idx=0, c=best_c)
+        mae, rmse, preds = evaluate_metrics(P_sm, M, N, R_train, R_truth, use_log_smooth=True)
+
+        mark = ""
+        if mae < best_softmax_mae:
+            best_softmax_mae = mae
+            best_softmax_config = {"最佳 c": best_c, "MAE": mae, "RMSE": rmse, "盲測預測": preds}
+            mark = " ← 最佳"
+        print(f"{temp:>12.1f} | {best_c:>6.2f} | {mae:>8.4f} | {rmse:>8.4f}{mark}")
+
+    results["Softmax（最佳 temperature）"] = best_softmax_config
+
+    # 最終報告
     print("\n" + "="*80)
-    print(" RWR 改良版結果（修復三項核心問題）")
+    print(" 三策略最終比較")
     print("="*80)
-    df_result = pd.DataFrame(results).T
-    print(df_result.to_string())
+    print(pd.DataFrame(results).T.to_string())
     print("="*80)
-    
-    # 額外：對比 log vs 不 log
-    print("\n[輔助實驗] Log 平滑 vs 不平滑 對比（Binary, c=0.35）")
-    W_b = get_transition_matrix(A, "pure_binary")
-    P_b = run_rwr(W_b, target_idx=0, c=0.35)
-    mae_no_log,  rmse_no_log,  _ = evaluate_metrics(P_b, M, N, R_train, R_truth, use_log_smooth=False)
-    mae_log,     rmse_log,     _ = evaluate_metrics(P_b, M, N, R_train, R_truth, use_log_smooth=True)
-    print(f"  不平滑：MAE={mae_no_log:.4f}  RMSE={rmse_no_log:.4f}")
-    print(f"  Log平滑：MAE={mae_log:.4f}  RMSE={rmse_log:.4f}")
