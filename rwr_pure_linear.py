@@ -185,8 +185,8 @@ if __name__ == "__main__":
 
     # 原本兩個策略
     for strategy_label, strategy_key in [
-        ("Binary（忽略分數）",     "pure_binary"),
-        ("Linear（原始分數比例）", "pure_linear"),
+        ("Binary",     "pure_binary"),
+        ("Linear", "pure_linear"),
     ]:
         W = get_transition_matrix(A, strategy_key)
         best_c = sweep_c_values(W, M, N, R_train, R_truth, strategy_label)
