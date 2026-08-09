@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 
@@ -95,7 +96,7 @@ def calculate_ndcg(user_records):
 # 5. 對所有學生跑 RWR 並評估
 # ==========================================
 def evaluate_all_students(W, df_train, df_truth, test_df,
-                           c=0.35, use_log_smooth=True):
+                           c=0.35, use_log_smooth=True, return_details=False):
     R_train = df_train.values.astype(np.float64)
     user_list = df_train.index.tolist()
     item_list = df_train.columns.tolist()
@@ -135,6 +136,7 @@ def evaluate_all_students(W, df_train, df_truth, test_df,
     # 逐筆計算誤差與收集 NDCG bundle
     errors = []
     ndcg_bundles = {}
+    details = []
 
     for _, row in test_df.iterrows():
         u, i = row['Student_ID'], row['Course_ID']
@@ -151,6 +153,11 @@ def evaluate_all_students(W, df_train, df_truth, test_df,
         if u not in ndcg_bundles:
             ndcg_bundles[u] = []
         ndcg_bundles[u].append({'true': true_s, 'pred': pred_val})
+        if return_details:
+            details.append({
+                "Student_ID": u, "Course_ID": i, "Actual": true_s,
+                "Predicted": round(pred_val, 4), "Error": round(abs(true_s - pred_val), 4),
+            })
 
     mae  = np.mean(errors)
     rmse = np.sqrt(np.mean(np.array(errors) ** 2))
@@ -158,6 +165,8 @@ def evaluate_all_students(W, df_train, df_truth, test_df,
     # calculate_ndcg 對他們會硬回傳 1.0，混進平均會虛灌分數。
     ndcg_scores = [calculate_ndcg(records) for records in ndcg_bundles.values() if len(records) > 1]
     ndcg = float(np.mean(ndcg_scores)) if ndcg_scores else float('nan')
+    if return_details:
+        return mae, rmse, ndcg, pd.DataFrame(details)
     return mae, rmse, ndcg
 
 # ==========================================
@@ -192,14 +201,18 @@ if __name__ == "__main__":
     A = build_adjacency_matrix(R_train)
 
     results = []
+    all_details = []
 
     # Binary 和 Linear
     for label, key in [("Binary", "pure_binary"), ("Linear", "pure_linear")]:
         W = get_transition_matrix(A, key)
         best_c = sweep_c_values(W, df_train, df_truth, test_df, label)
-        mae, rmse, ndcg = evaluate_all_students(W, df_train, df_truth, test_df, c=best_c)
+        mae, rmse, ndcg, details = evaluate_all_students(
+            W, df_train, df_truth, test_df, c=best_c, return_details=True)
         results.append({"Method": f"RWR_{label}", "Best_c": best_c,
                         "MAE": mae, "RMSE": rmse, "NDCG": ndcg})
+        details.insert(0, "Method", f"RWR_{label}")
+        all_details.append(details)
         print(f"✅ {label} 完畢 | c={best_c} | MAE={mae:.4f} | RMSE={rmse:.4f} | NDCG={ndcg:.4f}")
 
     # Softmax + temperature 掃描
@@ -208,6 +221,7 @@ if __name__ == "__main__":
     print("-" * 52)
 
     best_softmax = {"RMSE": float('inf')}
+    best_softmax_W, best_softmax_c = None, None
     for temp in [0.3, 0.5, 0.8, 1.0, 1.5, 2.0]:
         W_sm = get_transition_matrix(A, "softmax", temperature=temp)
         best_c = sweep_c_values(W_sm, df_train, df_truth, test_df, f"Softmax T={temp}")
@@ -217,10 +231,15 @@ if __name__ == "__main__":
         if rmse < best_softmax["RMSE"]:
             best_softmax = {"Method": f"RWR_Softmax(T={temp})", "Best_c": best_c,
                             "MAE": mae, "RMSE": rmse, "NDCG": ndcg}
+            best_softmax_W, best_softmax_c = W_sm, best_c
             mark = " ← 最佳"
         print(f"{temp:>12.1f} | {best_c:>6.2f} | {mae:>8.4f} | {rmse:>8.4f} | {ndcg:>8.4f}{mark}")
 
     results.append(best_softmax)
+    _, _, _, softmax_details = evaluate_all_students(
+        best_softmax_W, df_train, df_truth, test_df, c=best_softmax_c, return_details=True)
+    softmax_details.insert(0, "Method", best_softmax["Method"])
+    all_details.append(softmax_details)
 
     # 最終報告
     report_df = pd.DataFrame(results)[["Method", "Best_c", "MAE", "RMSE", "NDCG"]]
@@ -230,3 +249,9 @@ if __name__ == "__main__":
     print("="*65)
     print(report_df.to_string(index=False))
     print("="*65)
+
+    results_dir = os.path.join(os.path.dirname(__file__), "results")
+    os.makedirs(results_dir, exist_ok=True)
+    report_df.to_csv(os.path.join(results_dir, "RWR_Summary.csv"), index=False, encoding="utf-8-sig")
+    pd.concat(all_details, ignore_index=True).to_csv(
+        os.path.join(results_dir, "RWR_details.csv"), index=False, encoding="utf-8-sig")

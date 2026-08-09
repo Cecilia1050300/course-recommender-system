@@ -75,6 +75,7 @@ def run_mf_tuning_experiment(rating_df, test_df, epochs_list=[10, 20, 50, 100], 
     g_mean = rs_t.mean().item()
 
     tuning_results = []
+    all_details = {}
 
     for target_epoch in epochs_list:
         print(f"\n🔄 正在測試 Epochs = {target_epoch}...")
@@ -103,6 +104,7 @@ def run_mf_tuning_experiment(rating_df, test_df, epochs_list=[10, 20, 50, 100], 
         errors = []
         failed_count = 0
         ndcg_bundles = {}  # ★ 收集每位學生的預測紀錄
+        details = []  # 每筆測試資料的真實值/預測值，供人工抽查核對
 
         for _, row in test_df.iterrows():
             u = str(row['Student_ID'])
@@ -126,6 +128,11 @@ def run_mf_tuning_experiment(rating_df, test_df, epochs_list=[10, 20, 50, 100], 
             if u not in ndcg_bundles:
                 ndcg_bundles[u] = []
             ndcg_bundles[u].append({'true': true_s, 'pred': pred_val})
+            details.append({
+                "Student_ID": u, "Course_ID": i,
+                "Actual": true_s, "Predicted": round(pred_val, 4),
+                "Error": round(abs(true_s - pred_val), 4),
+            })
 
         final_mae  = np.mean(errors)
         final_rmse = np.sqrt(np.mean(np.array(errors) ** 2))
@@ -143,9 +150,12 @@ def run_mf_tuning_experiment(rating_df, test_df, epochs_list=[10, 20, 50, 100], 
             "NDCG"                    : final_ndcg,  # ★
             "Failed_Predictions (NaN)": failed_count
         })
+        all_details[target_epoch] = pd.DataFrame(details)
         print(f"  ✅ Epochs={target_epoch} | RMSE: {final_rmse:.4f} | MAE: {final_mae:.4f} | NDCG: {final_ndcg:.4f}")
 
-    return pd.DataFrame(tuning_results)
+    results_df = pd.DataFrame(tuning_results)
+    best_epoch = results_df.loc[results_df["RMSE"].idxmin(), "Epochs_Setting"]
+    return results_df, all_details[best_epoch]
 
 # ==========================================
 # 3. 主程式
@@ -160,8 +170,14 @@ if __name__ == "__main__":
         test_data['Student_ID'] = test_data['Student_ID'].astype(str)
         test_data['Course_ID']  = test_data['Course_ID'].astype(str)
 
-        final_report = run_mf_tuning_experiment(rating_data, test_data, epochs_list=[10, 20, 50, 100])
-        final_report.to_csv('MF_Epochs_Convergence_Report.csv', index=False, encoding='utf-8-sig')
+        final_report, best_details = run_mf_tuning_experiment(rating_data, test_data, epochs_list=[10, 20, 50, 100])
+
+        results_dir = os.path.join(os.path.dirname(__file__), "results")
+        os.makedirs(results_dir, exist_ok=True)
+        final_report.to_csv(os.path.join(results_dir, "MF_Epochs_Convergence_Report.csv"),
+                             index=False, encoding='utf-8-sig')
+        best_details.to_csv(os.path.join(results_dir, "MF_details.csv"),
+                             index=False, encoding='utf-8-sig')
 
         pd.set_option('display.float_format', lambda x: f'{x:.4f}')
         print("\n" + "="*70)

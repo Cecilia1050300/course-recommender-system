@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -191,6 +192,7 @@ methods = [
 ]
 k_list = [1, 3, 5, 7, 9]
 experiment_results = []
+all_details = {}  # (method, k) -> 每筆測試資料的真實值/預測值，供人工抽查核對
 
 print("\n🚀 開始 6-Ways × 5 K值 盲測實驗...")
 for name, m_type, sim_df in methods:
@@ -199,9 +201,11 @@ for name, m_type, sim_df in methods:
         # ★ 分三層統計，方便報告說明
         tier_counts = {0: 0, 1: 0, 2: 0}
         ndcg_bundles = {}
+        details = []
 
         for _, row in test_df.iterrows():
             uid    = str(row['Student_ID'])
+            cid    = str(row['Course_ID'])
             actual = row['Actual_Grade']
 
             pred, tier = predict_v2(row['Student_ID'], row['Course_ID'],
@@ -217,7 +221,13 @@ for name, m_type, sim_df in methods:
             if uid not in ndcg_bundles:
                 ndcg_bundles[uid] = []
             ndcg_bundles[uid].append({'true': actual, 'pred': pred})
+            details.append({
+                "Method": name, "Student_ID": uid, "Course_ID": cid,
+                "Actual": actual, "Predicted": round(float(pred), 4),
+                "Error": round(abs(actual - pred), 4), "Tier": tier,
+            })
 
+        all_details[(name, k_val)] = pd.DataFrame(details)
         mae  = np.mean(abs_errors)
         rmse = np.sqrt(np.mean(np.array(abs_errors) ** 2))
         # 只算有 >=2 筆蓋牌測試資料的學生，單筆學生 calculate_ndcg 會硬回傳
@@ -251,6 +261,17 @@ best_df = pd.DataFrame(best_rows)[
     ["Method", "K_Value", "MAE", "RMSE", "NDCG",
      "Tier0_CF", "Tier1_ItemMean", "Tier2_ColdStart"]
 ]
+
+# 每個方法在自己最佳 K 值下的逐筆真實值/預測值，供人工抽查核對
+best_details = pd.concat(
+    [all_details[(row["Method"], row["K_Value"])] for _, row in best_df.iterrows()],
+    ignore_index=True,
+)
+
+results_dir = os.path.join(os.path.dirname(__file__), "results")
+os.makedirs(results_dir, exist_ok=True)
+best_df.to_csv(os.path.join(results_dir, "Final_MAE_Summary_NDCG.csv"), index=False, encoding="utf-8-sig")
+best_details.to_csv(os.path.join(results_dir, "CF_details.csv"), index=False, encoding="utf-8-sig")
 
 pd.set_option('display.float_format', lambda x: f'{x:.4f}')
 pd.set_option('display.max_columns', None)
