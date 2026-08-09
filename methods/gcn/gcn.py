@@ -1,178 +1,285 @@
 """
-=============================================================================
-大學課程推薦系統 — 圖卷積網路 (Graph Convolutional Network, GCN)
-=============================================================================
-演算法架構：
-  1. 讀取修課矩陣，建立包含自環（Self-loop）的全局無向鄰接矩陣 A_tilde
-  2. 計算對角線度數矩陣 D_tilde，並實作對稱對角正規化 D^{-1/2} * A * D^{-1/2}
-  3. 初始化節點特徵矩陣 X（使用隨機向量模擬課程與學生的初始特徵嵌入）
-  4. 執行兩層 GCN 前向傳播（Message Passing & Aggregation）：
-     Layer 1: H1 = ReLU( W_hat * X * W1 )
-     Layer 2: H2 = W_hat * H1 * W2
-  5. 解析出學生與課程的最終 Embedding，利用內積（Dot Product）預測分數
-  6. 評估機制：針對盲測集計算 MAE / RMSE
-=============================================================================
+GCN course recommender experiment.
+
+This is the single maintained GCN script for the project. It uses pure PyTorch
+instead of PyTorch Geometric so it is easier to run and explain in a lab
+environment.
+
+Evaluation protocol:
+- Use old/rating_matrix - rating_matrix.csv as the full rating matrix.
+- Use test_set.csv as the held-out test set.
+- Mask every test_set rating from the training graph before training.
+- Report MAE, RMSE, NDCG, failed prediction count, and test row count.
 """
+
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
-# =============================================================================
-# 1. 資料載入與圖結構建置
-# =============================================================================
 
-def load_data(train_path, truth_path):
-    df_train = pd.read_csv(train_path, index_col=0)
-    df_truth = pd.read_csv(truth_path, index_col=0)
-    
-    user_ids = list(df_train.index)
-    item_ids = list(df_train.columns)
-    
-    R_train = df_train.values.astype(np.float64)
-    R_truth = df_truth.values.astype(np.float64)
-    return R_train, R_truth, user_ids, item_ids
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+MATRIX_PATH = PROJECT_ROOT / "old" / "rating_matrix - rating_matrix.csv"
+TEST_PATH = PROJECT_ROOT / "test_set.csv"
+RESULTS_DIR = Path(__file__).resolve().parent / "results"
 
-def build_gcn_normalized_adjacency(R_train):
-    """
-    實作 GCN 核心的對稱正規化鄰接矩陣: W_hat = D^{-1/2} * A_tilde * D^{-1/2}
-    """
-    M, N = R_train.shape
-    total_nodes = M + N
-    
-    # 建立基礎二部圖鄰接矩陣
-    A = np.zeros((total_nodes, total_nodes), dtype=np.float64)
-    # 這裡將大於 0 的修課行為視為拓樸連線 (1)
-    W_binary = (R_train > 0).astype(np.float64)
-    A[:M, M:] = W_binary
-    A[M:, :M] = W_binary.T
-    
-    # 💡 GCN 核心特點：加入自環 (Self-loop)，讓節點更新時也能保留自己的特徵
-    A_tilde = A + np.eye(total_nodes)
-    
-    # 計算度數矩陣 D_tilde (每列的加總)
-    row_sums = A_tilde.sum(axis=1)
-    
-    # 計算 D^{-1/2}
-    d_inv_sqrt = np.power(row_sums, -0.5, where=row_sums > 0)
-    d_inv_sqrt[row_sums == 0] = 0.0
-    D_inv_sqrt = np.diag(d_inv_sqrt)
-    
-    # 對稱正規化 W_hat = D^{-1/2} * A_tilde * D^{-1/2}
-    W_hat = D_inv_sqrt.dot(A_tilde).dot(D_inv_sqrt)
-    
-    print(f"[GCN 圖建置] 總節點數: {total_nodes} (學生: {M}, 課程: {N})")
-    print(f"[GCN 圖建置] 正規化矩陣驗證 - 最大值: {W_hat.max():.4f}, 最小值: {W_hat.min():.4f}")
-    return W_hat
 
-# =============================================================================
-# 2. GCN 模型前向傳播機制 (Forward Propagation)
-# =============================================================================
+def load_data():
+    rating_df = pd.read_csv(MATRIX_PATH, index_col=0).fillna(0)
+    rating_df.index = rating_df.index.astype(str)
+    rating_df.columns = rating_df.columns.astype(str)
 
-def relu(x):
-    return np.maximum(0, x)
+    test_df = pd.read_csv(TEST_PATH)
+    test_df["Student_ID"] = test_df["Student_ID"].astype(str)
+    test_df["Course_ID"] = test_df["Course_ID"].astype(str)
+    return rating_df, test_df
 
-def forward_gcn(W_hat, num_nodes, feature_dim=16, hidden_dim=8, out_dim=4, seed=42):
-    """
-    模擬 2-Layer GCN 的特徵聚合與變換過程
-    """
-    rng = np.random.default_rng(seed)
-    
-    # 🚀 步驟一：初始化節點特徵 X (長度 = 總節點數 x 初始特徵維度)
-    # 現實中這可以用 Word2Vec 跑課程大綱，這裡使用標準常態分佈隨機初始化
-    X = rng.normal(0, 0.1, size=(num_nodes, feature_dim))
-    
-    # 🚀 步驟二：定義兩層的神經網路權重矩陣 (Weights)
-    W1 = rng.normal(0, 0.1, size=(feature_dim, hidden_dim))
-    W2 = rng.normal(0, 0.1, size=(hidden_dim, out_dim))
-    
-    # 🚀 步驟三：Layer 1 卷積 -> 鄰居特徵聚合 + 線性變換 + ReLU 激活
-    # H1 = ReLU( W_hat * X * W1 )
-    Z1 = W_hat.dot(X).dot(W1)
-    H1 = relu(Z1)
-    
-    # 🚀 步驟四：Layer 2 卷積 -> 得到最終降維後的節點 Embedding (空間表徵)
-    # H2 = W_hat * H1 * W2
-    H2 = W_hat.dot(H1).dot(W2)
-    
-    print(f"[GCN 前向傳播] 成功生成最終節點 Embedding，特徵維度壓縮軌跡: {feature_dim} -> {hidden_dim} -> {out_dim}")
-    return H2
 
-# =============================================================================
-# 3. 分數預測、盲測評估與 Top-N 推薦
-# =============================================================================
+def make_masked_train(rating_df, test_df):
+    train_df = rating_df.copy()
+    masked_count = 0
 
-def predict_and_evaluate(H2, M, N, R_train, R_truth, target_user_idx, item_ids, top_n=5):
-    # 抽離出學生 Embedding 與 課程 Embedding
-    user_embeddings = H2[:M, :]  # Shape: (M, out_dim)
-    item_embeddings = H2[M:, :]  # Shape: (N, out_dim)
-    
-    # 利用內積 (Dot Product) 計算目標學生對所有課程的原始預測得分
-    target_user_emb = user_embeddings[target_user_idx] # (out_dim,)
-    raw_predictions = item_embeddings.dot(target_user_emb) # (N,)
-    
-    # ➔ 將內積學到的神經網路分數，Min-Max 映射回 1.0 ~ 5.0 分的空間
-    max_val = raw_predictions.max()
-    min_val = raw_predictions.min()
-    if max_val != min_val:
-        pred_ratings = 1.0 + 4.0 * ((raw_predictions - min_val) / (max_val - min_val))
+    for _, row in test_df.iterrows():
+        user_id = row["Student_ID"]
+        course_id = row["Course_ID"]
+        if user_id in train_df.index and course_id in train_df.columns:
+            train_df.loc[user_id, course_id] = 0.0
+            masked_count += 1
+
+    return train_df, masked_count
+
+
+def build_gcn_matrix(train_matrix):
+    num_users, num_items = train_matrix.shape
+    total_nodes = num_users + num_items
+
+    adjacency = np.zeros((total_nodes, total_nodes), dtype=np.float64)
+    binary_edges = (train_matrix > 0).astype(np.float64)
+    adjacency[:num_users, num_users:] = binary_edges
+    adjacency[num_users:, :num_users] = binary_edges.T
+
+    adjacency_with_loops = adjacency + np.eye(total_nodes)
+    degrees = adjacency_with_loops.sum(axis=1)
+    d_inv_sqrt = np.power(degrees, -0.5, where=degrees > 0)
+    d_inv_sqrt[degrees == 0] = 0.0
+    normalized = np.diag(d_inv_sqrt).dot(adjacency_with_loops).dot(np.diag(d_inv_sqrt))
+    return torch.FloatTensor(normalized)
+
+
+class GCNLayer(nn.Module):
+    def __init__(self, in_dim, out_dim):
+        super().__init__()
+        self.weight = nn.Parameter(torch.FloatTensor(in_dim, out_dim))
+        nn.init.xavier_uniform_(self.weight)
+
+    def forward(self, features, normalized_adjacency):
+        return normalized_adjacency @ features @ self.weight
+
+
+class GCNRecommender(nn.Module):
+    def __init__(self, total_nodes, hidden_dim=12, embedding_dim=4, dropout=0.1):
+        super().__init__()
+        self.features = nn.Parameter(torch.eye(total_nodes), requires_grad=False)
+        self.gcn1 = GCNLayer(total_nodes, hidden_dim)
+        self.gcn2 = GCNLayer(hidden_dim, embedding_dim)
+        self.dropout = dropout
+
+    def forward(self, normalized_adjacency):
+        hidden = self.gcn1(self.features, normalized_adjacency)
+        hidden = F.relu(hidden)
+        hidden = F.dropout(hidden, p=self.dropout, training=self.training)
+        return self.gcn2(hidden, normalized_adjacency)
+
+
+def minmax_to_rating(raw_scores, candidate_mask):
+    ratings = np.zeros_like(raw_scores, dtype=float)
+    candidate_values = raw_scores[candidate_mask]
+
+    if candidate_values.size == 0:
+        return ratings
+
+    min_score = candidate_values.min()
+    max_score = candidate_values.max()
+    if max_score != min_score:
+        ratings[candidate_mask] = 1.0 + 4.0 * (
+            (candidate_values - min_score) / (max_score - min_score)
+        )
     else:
-        pred_ratings = np.ones(N) * 3.0
-        
-    # --- 計算 MAE / RMSE (針對被挖洞的測試集) ---
-    test_mask = (R_train[target_user_idx] == 0) & (R_truth[target_user_idx] > 0)
-    test_count = int(test_mask.sum())
-    
-    mae, rmse = 0.0, 0.0
-    if test_count > 0:
-        y_true = R_truth[target_user_idx][test_mask]
-        y_pred = pred_ratings[test_mask]
-        mae = float(np.mean(np.abs(y_true - y_pred)))
-        rmse = float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
-        
-        print(f"\n  🎯 [GCN 盲測效果評估] (測試樣本數: {test_count})")
-        print(f"  🏆 【觀測結果】 GCN_MAE = {mae:.4f}  |  GCN_RMSE = {rmse:.4f}")
-    
-    # --- 輸出 Top-N 推薦結果 ---
-    df = pd.DataFrame({
-        "課程代碼": item_ids,
-        "GCN預測評分": pred_ratings,
-        "原始修課狀態": R_train[target_user_idx]
-    })
-    
-    # 排除已修課程
-    df_unvisited = df[df["原始修課狀態"] == 0].copy()
-    df_unvisited = df_unvisited.sort_values("GCN預測評分", ascending=False).reset_index(drop=True)
-    top_recommendations = df_unvisited.head(top_n)[["課程代碼", "GCN預測評分"]]
-    
-    print(f"\n  🎓 [GCN 推薦結果] 目標學生 {target_user_idx} 的 Top-{top_n} 課程：")
-    for rank, (_, row) in enumerate(top_recommendations.iterrows(), 1):
-        print(f"  第 {rank} 名：{row['課程代碼']:<15} 預測對齊評分 = {row['GCN預測評分']:.4f} 分")
-        
-    return mae, rmse
+        ratings[candidate_mask] = 3.0
+    return ratings
 
-# =============================================================================
-# 主程式入口
-# =============================================================================
+
+def build_prediction_matrix(embeddings, train_df):
+    train_matrix = train_df.values.astype(np.float64)
+    user_ids = train_df.index.tolist()
+    item_ids = train_df.columns.tolist()
+    num_users, _ = train_matrix.shape
+
+    user_embeddings = embeddings[:num_users].detach().cpu().numpy()
+    item_embeddings = embeddings[num_users:].detach().cpu().numpy()
+    raw_scores = user_embeddings.dot(item_embeddings.T)
+
+    prediction_rows = []
+    for user_idx in range(len(user_ids)):
+        candidate_mask = train_matrix[user_idx] == 0
+        prediction_rows.append(minmax_to_rating(raw_scores[user_idx], candidate_mask))
+
+    return pd.DataFrame(prediction_rows, index=user_ids, columns=item_ids)
+
+
+def calculate_ndcg(user_records):
+    if len(user_records) <= 1:
+        return 1.0
+
+    y_true = np.array([record["true"] for record in user_records], dtype=float)
+    y_pred = np.array([record["pred"] for record in user_records], dtype=float)
+
+    ranked_idx = np.argsort(y_pred)[::-1]
+    dcg = sum(
+        (2 ** y_true[i] - 1) / np.log2(rank + 2)
+        for rank, i in enumerate(ranked_idx)
+    )
+    ideal_scores = np.sort(y_true)[::-1]
+    idcg = sum(
+        (2 ** score - 1) / np.log2(rank + 2)
+        for rank, score in enumerate(ideal_scores)
+    )
+    return float(dcg / idcg) if idcg > 0 else 1.0
+
+
+def evaluate_prediction_matrix(pred_df, test_df):
+    errors = []
+    details = []
+    ndcg_bundles = {}
+    failed_count = 0
+
+    for _, row in test_df.iterrows():
+        user_id = row["Student_ID"]
+        course_id = row["Course_ID"]
+        actual = float(row["Actual_Grade"])
+
+        if user_id in pred_df.index and course_id in pred_df.columns:
+            predicted = float(np.clip(pred_df.loc[user_id, course_id], 1.0, 5.0))
+            error = abs(actual - predicted)
+        else:
+            predicted = 0.0
+            error = 5.0
+            failed_count += 1
+
+        errors.append(error)
+        details.append(
+            {
+                "Student_ID": user_id,
+                "Course_ID": course_id,
+                "Actual": actual,
+                "Predicted": round(predicted, 4),
+                "Error": round(error, 4),
+            }
+        )
+        ndcg_bundles.setdefault(user_id, []).append(
+            {"true": actual, "pred": predicted}
+        )
+
+    error_array = np.array(errors, dtype=float)
+    summary = {
+        "MAE": float(error_array.mean()),
+        "RMSE": float(np.sqrt(np.mean(error_array ** 2))),
+        "NDCG": float(np.mean([calculate_ndcg(r) for r in ndcg_bundles.values()])),
+        "Failed_Predictions": failed_count,
+        "Test_Rows": int(len(test_df)),
+    }
+    return summary, pd.DataFrame(details)
+
+
+def save_report(summary, details_df):
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame([{"Method": "GCN_Pure_Torch", **summary}]).to_csv(
+        RESULTS_DIR / "GCN_Pure_Torch_summary.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+    details_df.to_csv(
+        RESULTS_DIR / "GCN_Pure_Torch_details.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
+
+
+def run_experiment(epochs=20, lr=0.01, weight_decay=1e-4):
+    torch.manual_seed(42)
+    np.random.seed(42)
+
+    rating_df, test_df = load_data()
+    train_df, masked_count = make_masked_train(rating_df, test_df)
+    train_matrix = train_df.values.astype(np.float64)
+    num_users, num_items = train_matrix.shape
+
+    normalized_adjacency = build_gcn_matrix(train_matrix)
+    model = GCNRecommender(total_nodes=num_users + num_items)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+
+    train_user_idx, train_item_idx = np.where(train_matrix > 0)
+    train_user_idx_t = torch.LongTensor(train_user_idx)
+    train_item_idx_t = torch.LongTensor(train_item_idx)
+    train_targets_t = torch.FloatTensor(train_matrix[train_user_idx, train_item_idx])
+
+    print(f"Rating matrix: {num_users} users x {num_items} courses")
+    print(f"Masked test ratings from training graph: {masked_count}")
+
+    last_loss = 0.0
+    for epoch in range(1, epochs + 1):
+        model.train()
+        optimizer.zero_grad()
+
+        embeddings = model(normalized_adjacency)
+        user_embeddings = embeddings[:num_users]
+        item_embeddings = embeddings[num_users:]
+        predictions = torch.sum(
+            user_embeddings[train_user_idx_t] * item_embeddings[train_item_idx_t],
+            dim=1,
+        )
+        loss = F.mse_loss(predictions, train_targets_t)
+        loss.backward()
+        optimizer.step()
+        last_loss = float(loss.item())
+
+        if epoch == 1 or epoch % 5 == 0:
+            model.eval()
+            with torch.no_grad():
+                pred_df = build_prediction_matrix(model(normalized_adjacency), train_df)
+                summary, _ = evaluate_prediction_matrix(pred_df, test_df)
+            print(
+                f"Epoch {epoch:2d} | Loss: {last_loss:.4f} | "
+                f"MAE: {summary['MAE']:.4f} | RMSE: {summary['RMSE']:.4f} | "
+                f"NDCG: {summary['NDCG']:.4f}"
+            )
+
+    model.eval()
+    with torch.no_grad():
+        final_pred_df = build_prediction_matrix(model(normalized_adjacency), train_df)
+
+    summary, details_df = evaluate_prediction_matrix(final_pred_df, test_df)
+    summary["Training_Loss"] = last_loss
+    summary["Masked_Ratings"] = masked_count
+    save_report(summary, details_df)
+    return summary
+
+
+def print_summary(summary):
+    print("\n" + "=" * 70)
+    print("GCN Pure PyTorch Final Result")
+    print("=" * 70)
+    print(f"MAE  : {summary['MAE']:.4f}")
+    print(f"RMSE : {summary['RMSE']:.4f}")
+    print(f"NDCG : {summary['NDCG']:.4f}")
+    print(f"Failed predictions: {summary['Failed_Predictions']}")
+    print(f"Test rows: {summary['Test_Rows']}")
+    print("=" * 70)
+
 
 if __name__ == "__main__":
-    # 使用你昨天跑出來的兩張模擬資料表進行基準測試
-    TRAIN_CSV = "rating_matrix_train.csv"
-    TRUTH_CSV = "rating_matrix_truth.csv"
-    
-    print("\n" + "="*60)
-    print("  🚀 啟動最新階段：Graph Convolutional Network (GCN) 模型")
-    print("="*60)
-    
-    # 1. 載入資料
-    R_train, R_truth, user_ids, item_ids = load_data(TRAIN_CSV, TRUTH_CSV)
-    M, N = R_train.shape
-    
-    # 2. 建立 GCN 特有的對稱歸一化圖拓樸結構
-    W_hat = build_gcn_normalized_adjacency(R_train)
-    
-    # 3. 執行兩層空間域 GCN 特徵聚合傳播
-    H2 = forward_gcn(W_hat, num_nodes=M+N, feature_dim=16, hidden_dim=8, out_dim=4)
-    
-    # 4. 計算指標與產出推薦
-    predict_and_evaluate(H2, M, N, R_train, R_truth, target_user_idx=0, item_ids=item_ids, top_n=5)
-    print("="*60 + "\n")
+    final_summary = run_experiment()
+    print_summary(final_summary)

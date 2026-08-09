@@ -86,8 +86,15 @@ Location: `methods/gcn/`
 Main scripts include:
 
 - `gcn.py`
-- `pure_torch_gcn_train.py`
-- `pyg_gcn_train.py`
+
+GCN evaluation now uses the same formal dataset split as MF and RWR:
+
+- Matrix: `old/rating_matrix - rating_matrix.csv`
+- Test set: `test_set.csv`
+- Test ratings are masked from the training graph before evaluation.
+- Reported metrics: `MAE`, `RMSE`, `NDCG`, failed prediction count, and test row count.
+- Output files are written to `methods/gcn/results/`.
+- The maintained GCN version uses pure PyTorch. PyTorch Geometric is not required.
 
 ## Shared Files
 
