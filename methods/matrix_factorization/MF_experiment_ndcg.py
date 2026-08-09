@@ -130,8 +130,10 @@ def run_mf_tuning_experiment(rating_df, test_df, epochs_list=[10, 20, 50, 100], 
         final_mae  = np.mean(errors)
         final_rmse = np.sqrt(np.mean(np.array(errors) ** 2))
 
-        # ★ 計算平均 NDCG
-        final_ndcg = np.mean([calculate_ndcg(records) for records in ndcg_bundles.values()])
+        # ★ 計算平均 NDCG（只算有 >=2 筆蓋牌測試資料的學生，
+        #    單筆學生 calculate_ndcg 會硬回傳 1.0，混進平均會虛灌分數）
+        ndcg_scores = [calculate_ndcg(records) for records in ndcg_bundles.values() if len(records) > 1]
+        final_ndcg = np.mean(ndcg_scores) if ndcg_scores else float('nan')
 
         tuning_results.append({
             "Method"                  : "Matrix_Factorization",

@@ -220,7 +220,10 @@ for name, m_type, sim_df in methods:
 
         mae  = np.mean(abs_errors)
         rmse = np.sqrt(np.mean(np.array(abs_errors) ** 2))
-        ndcg = np.mean([calculate_ndcg(records) for records in ndcg_bundles.values()])
+        # 只算有 >=2 筆蓋牌測試資料的學生，單筆學生 calculate_ndcg 會硬回傳
+        # 1.0，混進平均會虛灌分數。
+        ndcg_scores = [calculate_ndcg(records) for records in ndcg_bundles.values() if len(records) > 1]
+        ndcg = np.mean(ndcg_scores) if ndcg_scores else float('nan')
 
         experiment_results.append({
             "Method"          : name,

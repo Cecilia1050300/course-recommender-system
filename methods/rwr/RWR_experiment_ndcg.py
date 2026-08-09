@@ -154,7 +154,10 @@ def evaluate_all_students(W, df_train, df_truth, test_df,
 
     mae  = np.mean(errors)
     rmse = np.sqrt(np.mean(np.array(errors) ** 2))
-    ndcg = np.mean([calculate_ndcg(records) for records in ndcg_bundles.values()])
+    # 只對有 >=2 筆蓋牌測試資料的學生算 NDCG，單筆學生沒有排序可比較，
+    # calculate_ndcg 對他們會硬回傳 1.0，混進平均會虛灌分數。
+    ndcg_scores = [calculate_ndcg(records) for records in ndcg_bundles.values() if len(records) > 1]
+    ndcg = float(np.mean(ndcg_scores)) if ndcg_scores else float('nan')
     return mae, rmse, ndcg
 
 # ==========================================

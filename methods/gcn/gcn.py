@@ -184,10 +184,14 @@ def evaluate_prediction_matrix(pred_df, test_df):
         )
 
     error_array = np.array(errors, dtype=float)
+    # 只對有 >=2 筆蓋牌測試資料的學生算 NDCG，單筆學生沒有排序可比較，
+    # calculate_ndcg 對他們會硬回傳 1.0，混進平均會虛灌分數。
+    ndcg_scores = [calculate_ndcg(r) for r in ndcg_bundles.values() if len(r) > 1]
     summary = {
         "MAE": float(error_array.mean()),
         "RMSE": float(np.sqrt(np.mean(error_array ** 2))),
-        "NDCG": float(np.mean([calculate_ndcg(r) for r in ndcg_bundles.values()])),
+        "NDCG": float(np.mean(ndcg_scores)) if ndcg_scores else float("nan"),
+        "NDCG_Users": len(ndcg_scores),
         "Failed_Predictions": failed_count,
         "Test_Rows": int(len(test_df)),
     }
@@ -274,7 +278,7 @@ def print_summary(summary):
     print("=" * 70)
     print(f"MAE  : {summary['MAE']:.4f}")
     print(f"RMSE : {summary['RMSE']:.4f}")
-    print(f"NDCG : {summary['NDCG']:.4f}")
+    print(f"NDCG : {summary['NDCG']:.4f} (based on {summary['NDCG_Users']} students with >=2 test items)")
     print(f"Failed predictions: {summary['Failed_Predictions']}")
     print(f"Test rows: {summary['Test_Rows']}")
     print("=" * 70)
