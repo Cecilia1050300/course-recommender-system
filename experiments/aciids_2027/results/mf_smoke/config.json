@@ -1,0 +1,79 @@
+{
+  "method": "biased_matrix_factorization",
+  "mode": "smoke",
+  "seed": 42,
+  "reproducibility": {
+    "seed": 42,
+    "python_hash_seed": "42",
+    "deterministic_requested": true,
+    "cublas_workspace_config": ":4096:8",
+    "torch_available": true,
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true
+  },
+  "execution_device": "cuda",
+  "gpu_name": "NVIDIA RTX A6000",
+  "grid": {
+    "epochs": [
+      2,
+      4
+    ],
+    "dim": 8
+  },
+  "fixed_hyperparameters": {
+    "lr": 0.01,
+    "weight_decay": 0.001
+  },
+  "selected_hyperparameters": {
+    "epochs": 4,
+    "dim": 8,
+    "lr": 0.01,
+    "weight_decay": 0.001
+  },
+  "evaluation_policy": {
+    "rating_min": 1.0,
+    "rating_max": 5.0,
+    "relevant_threshold": 4.0,
+    "top_ks": [
+      5,
+      10
+    ],
+    "missing_prediction": "train_global_mean"
+  },
+  "split_directory": "/home/training/research/course-recommender-system/experiments/aciids_2027/splits/seed_42",
+  "cold_start_statistics": {
+    "validation": {
+      "ratings": 600,
+      "users": 458,
+      "items": 89,
+      "density": 0.008638065073423552,
+      "cold_start_users_vs_train": 0,
+      "cold_start_items_vs_train": 0,
+      "per_user_interactions": {
+        "min": 1,
+        "max": 3,
+        "mean": 1.3100436681222707,
+        "median": 1.0,
+        "p25": 1.0,
+        "p75": 2.0
+      }
+    },
+    "test": {
+      "ratings": 599,
+      "users": 458,
+      "items": 88,
+      "density": 0.00862366829830118,
+      "cold_start_users_vs_train": 0,
+      "cold_start_items_vs_train": 0,
+      "per_user_interactions": {
+        "min": 1,
+        "max": 3,
+        "mean": 1.3078602620087336,
+        "median": 1.0,
+        "p25": 1.0,
+        "p75": 2.0
+      }
+    }
+  },
+  "runtime_seconds": 4.60230902954936
+}

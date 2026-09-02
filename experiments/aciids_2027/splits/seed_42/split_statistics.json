@@ -1,0 +1,72 @@
+{
+  "strategy": "per_user_warm_start_80_10_10_approx",
+  "immutable": true,
+  "source": "old/rating_matrix - rating_matrix.csv",
+  "source_sha256": "b29a40acf6ffac31f3e10603c3d27dc0dffe1c2debe46b8cfe3319b4c5a3ab4e",
+  "manifest_sha256": {
+    "train.csv": "e2c65069051612f39f7a3320747a0c1311645cdb24dd7b131562ba293a80758d",
+    "validation.csv": "15de9fdda7ce5114cc2be9118deb08df968211484524ee6fe1010a5ed646722a",
+    "test.csv": "81b900b059a45ddff7acd5e2bb8765d4c32f0322438ed130fbbf703c0e083891"
+  },
+  "reproducibility": {
+    "seed": 42,
+    "python_hash_seed": "42",
+    "deterministic_requested": true,
+    "cublas_workspace_config": ":4096:8",
+    "torch_available": true,
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true
+  },
+  "catalog_users": 460,
+  "catalog_items": 151,
+  "splits": {
+    "train": {
+      "ratings": 4845,
+      "users": 460,
+      "items": 151,
+      "density": 0.06975237546789519,
+      "cold_start_users_vs_train": 0,
+      "cold_start_items_vs_train": 0,
+      "per_user_interactions": {
+        "min": 1,
+        "max": 30,
+        "mean": 10.532608695652174,
+        "median": 9.0,
+        "p25": 1.0,
+        "p75": 17.0
+      }
+    },
+    "validation": {
+      "ratings": 600,
+      "users": 458,
+      "items": 89,
+      "density": 0.008638065073423552,
+      "cold_start_users_vs_train": 0,
+      "cold_start_items_vs_train": 0,
+      "per_user_interactions": {
+        "min": 1,
+        "max": 3,
+        "mean": 1.3100436681222707,
+        "median": 1.0,
+        "p25": 1.0,
+        "p75": 2.0
+      }
+    },
+    "test": {
+      "ratings": 599,
+      "users": 458,
+      "items": 88,
+      "density": 0.00862366829830118,
+      "cold_start_users_vs_train": 0,
+      "cold_start_items_vs_train": 0,
+      "per_user_interactions": {
+        "min": 1,
+        "max": 3,
+        "mean": 1.3078602620087336,
+        "median": 1.0,
+        "p25": 1.0,
+        "p75": 2.0
+      }
+    }
+  }
+}
