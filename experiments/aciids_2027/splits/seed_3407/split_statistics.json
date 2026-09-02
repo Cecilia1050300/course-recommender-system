@@ -1,0 +1,72 @@
+{
+  "strategy": "per_user_warm_start_80_10_10_approx",
+  "immutable": true,
+  "source": "old/rating_matrix - rating_matrix.csv",
+  "source_sha256": "b29a40acf6ffac31f3e10603c3d27dc0dffe1c2debe46b8cfe3319b4c5a3ab4e",
+  "manifest_sha256": {
+    "train.csv": "b03eaa6401a497d0c3835239a2e92e3cbdc5e1a0576fc20e73dcf07c7d912f02",
+    "validation.csv": "605b846e6ce0f7de51365b3cfe9ed04d6d9648f56fd55ac0df2f6b630dc1102a",
+    "test.csv": "a14563075d6ce2f9ffb3732922a9c2076105efe2bc99043ed2b9587a826e6f13"
+  },
+  "reproducibility": {
+    "seed": 3407,
+    "python_hash_seed": "3407",
+    "deterministic_requested": true,
+    "cublas_workspace_config": ":4096:8",
+    "torch_available": true,
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true
+  },
+  "catalog_users": 460,
+  "catalog_items": 151,
+  "splits": {
+    "train": {
+      "ratings": 4853,
+      "users": 460,
+      "items": 151,
+      "density": 0.06986754966887417,
+      "cold_start_users_vs_train": 0,
+      "cold_start_items_vs_train": 0,
+      "per_user_interactions": {
+        "min": 1,
+        "max": 30,
+        "mean": 10.55,
+        "median": 9.0,
+        "p25": 1.0,
+        "p75": 17.0
+      }
+    },
+    "validation": {
+      "ratings": 595,
+      "users": 457,
+      "items": 81,
+      "density": 0.00856608119781169,
+      "cold_start_users_vs_train": 0,
+      "cold_start_items_vs_train": 0,
+      "per_user_interactions": {
+        "min": 1,
+        "max": 3,
+        "mean": 1.301969365426696,
+        "median": 1.0,
+        "p25": 1.0,
+        "p75": 2.0
+      }
+    },
+    "test": {
+      "ratings": 596,
+      "users": 456,
+      "items": 91,
+      "density": 0.008580477972934063,
+      "cold_start_users_vs_train": 0,
+      "cold_start_items_vs_train": 0,
+      "per_user_interactions": {
+        "min": 1,
+        "max": 3,
+        "mean": 1.3070175438596492,
+        "median": 1.0,
+        "p25": 1.0,
+        "p75": 2.0
+      }
+    }
+  }
+}
