@@ -1,0 +1,35 @@
+{
+  "selected_hyperparameters": {
+    "embedding_dim": 64,
+    "number_of_layers": 1,
+    "learning_rate": 0.01,
+    "epochs": 100,
+    "weight_decay": 0.0
+  },
+  "test_evaluations": 1,
+  "training_loss": 0.6779768466949463,
+  "runtime_seconds": 1.0324072316288948,
+  "score_calibration": {
+    "ranking": "raw_dot_product_no_scaling_or_clipping",
+    "rating_metrics": "raw_dot_product_then_shared_evaluator_clip_to_[1,5]",
+    "fitted_calibration": "none"
+  },
+  "metrics": {
+    "MAE": 0.8697193554526378,
+    "RMSE": 1.167603058522515,
+    "Rating_Rows": 599,
+    "Missing_Predictions": 0,
+    "Fallback_Predictions": 0,
+    "Cold_User_Rows": 0,
+    "Cold_Item_Rows": 0,
+    "Ranking_Eligible_Users": 185,
+    "Precision@5": 0.13405405405405404,
+    "Recall@5": 0.6324324324324324,
+    "NDCG@5": 0.4473553639883973,
+    "HitRate@5": 0.654054054054054,
+    "Precision@10": 0.08540540540540541,
+    "Recall@10": 0.772972972972973,
+    "NDCG@10": 0.4948806335682916,
+    "HitRate@10": 0.8216216216216217
+  }
+}
