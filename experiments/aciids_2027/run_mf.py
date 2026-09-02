@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import sys
 import time
@@ -82,41 +83,91 @@ def main() -> None:
     user_ids, item_ids = matrix.index.astype(str).tolist(), matrix.columns.astype(str).tolist()
     train = pd.read_csv(args.splits / "train.csv", dtype={"Student_ID": str, "Course_ID": str})
     validation = pd.read_csv(args.splits / "validation.csv", dtype={"Student_ID": str, "Course_ID": str})
-    grid = ({"epochs": [10, 20, 50, 100], "dim": 64} if args.full else {"epochs": [2, 4], "dim": 8})
-    fixed = {"lr": .01, "weight_decay": 1e-3}
+    search_space = ({
+        "latent_dim": [16, 32, 64],
+        "epochs": [20, 50, 100],
+        "learning_rate": [.001, .005, .01],
+        "weight_decay": [.001],
+    } if args.full else {
+        "latent_dim": [8],
+        "epochs": [2, 4],
+        "learning_rate": [.01],
+        "weight_decay": [.001],
+    })
     policy = EvaluationPolicy()
     train_mean = float(train.Rating.mean())
     validation_rows = []
-    for epochs in grid["epochs"]:
-        predictions = fit_predict(train, user_ids, item_ids, epochs, grid["dim"], **fixed, seed=args.seed, device=device)
+    keys = ("latent_dim", "epochs", "learning_rate", "weight_decay")
+    configurations = itertools.product(*(search_space[key] for key in keys))
+    for values in configurations:
+        params = dict(zip(keys, values))
+        config_started = time.perf_counter()
+        predictions = fit_predict(
+            train, user_ids, item_ids,
+            epochs=params["epochs"], dim=params["latent_dim"],
+            lr=params["learning_rate"], weight_decay=params["weight_decay"],
+            seed=args.seed, device=device,
+        )
         metrics, _, _ = evaluate_predictions(predictions, validation, train, item_ids, train_mean, policy)
-        validation_rows.append({"epochs": epochs, "dim": grid["dim"], **fixed, **metrics})
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+        validation_rows.append({**params, "runtime_seconds": time.perf_counter() - config_started, **metrics})
     validation_df = pd.DataFrame(validation_rows)
-    selected = validation_df.sort_values(["RMSE", "MAE", "epochs"]).iloc[0]
-    selected_params = {"epochs": int(selected.epochs), "dim": grid["dim"], **fixed}
+    selected = validation_df.sort_values(
+        ["RMSE", "MAE", "latent_dim", "epochs", "learning_rate", "weight_decay"]
+    ).iloc[0]
+    selected_params = {
+        "latent_dim": int(selected.latent_dim),
+        "epochs": int(selected.epochs),
+        "learning_rate": float(selected.learning_rate),
+        "weight_decay": float(selected.weight_decay),
+    }
 
     # The test manifest is first loaded only after hyperparameter selection.
     test = pd.read_csv(args.splits / "test.csv", dtype={"Student_ID": str, "Course_ID": str})
-    final_predictions = fit_predict(train, user_ids, item_ids, **selected_params, seed=args.seed, device=device)
+    test_started = time.perf_counter()
+    final_predictions = fit_predict(
+        train, user_ids, item_ids,
+        epochs=selected_params["epochs"], dim=selected_params["latent_dim"],
+        lr=selected_params["learning_rate"], weight_decay=selected_params["weight_decay"],
+        seed=args.seed, device=device,
+    )
     test_metrics, details, per_user = evaluate_predictions(final_predictions, test, train, item_ids, train_mean, policy)
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+    test_runtime = time.perf_counter() - test_started
     runtime = time.perf_counter() - started
     split_stats = json.loads((args.splits / "split_statistics.json").read_text())
     config = {
         "method": "biased_matrix_factorization", "mode": "full" if args.full else "smoke",
         "seed": args.seed, "reproducibility": repro, "execution_device": str(device),
         "gpu_name": torch.cuda.get_device_name(device) if device.type == "cuda" else None,
-        "grid": grid, "fixed_hyperparameters": fixed,
+        "search_space": search_space,
         "selected_hyperparameters": selected_params,
         "evaluation_policy": policy.__dict__, "split_directory": str(args.splits),
         "cold_start_statistics": {name: split_stats["splits"][name] for name in ("validation", "test")},
         "runtime_seconds": runtime,
     }
     args.output.mkdir(parents=True, exist_ok=True)
-    validation_df.to_csv(args.output / "validation_metrics.csv", index=False)
+    validation_filename = "validation_results.csv" if args.full else "validation_metrics.csv"
+    validation_df.to_csv(args.output / validation_filename, index=False)
     pd.DataFrame([test_metrics]).to_csv(args.output / "test_metrics.csv", index=False)
     details.to_csv(args.output / "test_predictions.csv", index=False)
     per_user.to_csv(args.output / "test_per_user_metrics.csv", index=False)
     write_json(args.output / "config.json", config)
+    if args.full:
+        write_json(args.output / "selected_config.json", {
+            "selection_metric": "validation_RMSE",
+            "selected_hyperparameters": selected_params,
+            "validation_MAE": float(selected.MAE),
+            "validation_RMSE": float(selected.RMSE),
+        })
+        write_json(args.output / "final_test_results.json", {
+            "selected_hyperparameters": selected_params,
+            "test_evaluations": 1,
+            "runtime_seconds": test_runtime,
+            "metrics": test_metrics,
+        })
     summary = ["# MF benchmark summary", "", f"- Mode: {config['mode']}", f"- Seed: {args.seed}", f"- Device: {device}",
                f"- Selected hyperparameters: `{selected_params}`", f"- Runtime: {runtime:.3f} seconds", "", "## Validation grid", "",
                markdown_table(validation_df), "", "## Final test metrics", "", markdown_table(pd.DataFrame([test_metrics])), ""]

@@ -1,0 +1,28 @@
+{
+  "selected_hyperparameters": {
+    "latent_dim": 32,
+    "epochs": 100,
+    "learning_rate": 0.005,
+    "weight_decay": 0.001
+  },
+  "test_evaluations": 1,
+  "runtime_seconds": 1.0414436869323254,
+  "metrics": {
+    "MAE": 0.8292689014953842,
+    "RMSE": 1.024343442925574,
+    "Rating_Rows": 599,
+    "Missing_Predictions": 0,
+    "Fallback_Predictions": 0,
+    "Cold_User_Rows": 0,
+    "Cold_Item_Rows": 0,
+    "Ranking_Eligible_Users": 185,
+    "Precision@5": 0.06270270270270271,
+    "Recall@5": 0.26126126126126126,
+    "NDCG@5": 0.1937683492151804,
+    "HitRate@5": 0.3027027027027027,
+    "Precision@10": 0.04216216216216217,
+    "Recall@10": 0.34054054054054056,
+    "NDCG@10": 0.22159676327462235,
+    "HitRate@10": 0.372972972972973
+  }
+}
