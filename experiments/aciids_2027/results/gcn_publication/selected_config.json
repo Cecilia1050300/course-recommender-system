@@ -1,0 +1,13 @@
+{
+  "selection_metric": "validation_RMSE",
+  "selected_hyperparameters": {
+    "hidden_dim": 12,
+    "embedding_dim": 16,
+    "epochs": 20,
+    "learning_rate": 0.005,
+    "weight_decay": 0.0001,
+    "dropout": 0.1
+  },
+  "validation_MAE": 1.528959959546725,
+  "validation_RMSE": 1.8369098654937037
+}

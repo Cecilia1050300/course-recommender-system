@@ -1,0 +1,53 @@
+{
+  "method": "two_layer_vanilla_gcn",
+  "seed": 42,
+  "reproducibility": {
+    "seed": 42,
+    "python_hash_seed": "42",
+    "deterministic_requested": true,
+    "cublas_workspace_config": ":4096:8",
+    "torch_available": true,
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true
+  },
+  "execution_device": "cuda",
+  "gpu_name": "NVIDIA RTX A6000",
+  "search_space": {
+    "hidden_dim": [
+      12,
+      32
+    ],
+    "embedding_dim": [
+      4,
+      16
+    ],
+    "epochs": [
+      20,
+      50,
+      100
+    ],
+    "learning_rate": [
+      0.005,
+      0.01
+    ],
+    "weight_decay": [
+      0.0001
+    ],
+    "dropout": [
+      0.1
+    ]
+  },
+  "configuration_count": 24,
+  "evaluation_policy": {
+    "rating_min": 1.0,
+    "rating_max": 5.0,
+    "relevant_threshold": 4.0,
+    "top_ks": [
+      5,
+      10
+    ],
+    "missing_prediction": "train_global_mean"
+  },
+  "split_directory": "/home/training/research/course-recommender-system/experiments/aciids_2027/splits/seed_42",
+  "total_runtime_seconds": 30.303012179210782
+}
