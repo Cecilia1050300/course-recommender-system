@@ -1,0 +1,335 @@
+{
+  "protocol": "frozen_configuration_multi_seed_robustness",
+  "seeds": [
+    42,
+    123,
+    2026,
+    3407,
+    7777
+  ],
+  "configurations_frozen_before_run": {
+    "MF": {
+      "latent_dim": 32,
+      "epochs": 100,
+      "learning_rate": 0.005,
+      "weight_decay": 0.001
+    },
+    "LightGCN_RMSE": {
+      "embedding_dim": 64,
+      "number_of_layers": 1,
+      "learning_rate": 0.01,
+      "epochs": 100,
+      "weight_decay": 0.0
+    },
+    "LightGCN_Ranking": {
+      "embedding_dim": 32,
+      "number_of_layers": 3,
+      "learning_rate": 0.01,
+      "epochs": 100,
+      "weight_decay": 0.0
+    },
+    "Vanilla_GCN": {
+      "hidden_dim": 12,
+      "embedding_dim": 16,
+      "epochs": 20,
+      "learning_rate": 0.005,
+      "weight_decay": 0.0001,
+      "dropout": 0.1
+    }
+  },
+  "hyperparameter_search": false,
+  "validation_loaded": false,
+  "test_evaluations_per_model_seed": 1,
+  "evaluation_policy": {
+    "rating_min": 1.0,
+    "rating_max": 5.0,
+    "relevant_threshold": 4.0,
+    "top_ks": [
+      5,
+      10
+    ],
+    "missing_prediction": "train_global_mean"
+  },
+  "rating_calibration": {
+    "MF": "raw_scores_then_shared_evaluator_clip_to_[1,5]",
+    "LightGCN_RMSE": "raw_scores_then_shared_evaluator_clip_to_[1,5]",
+    "LightGCN_Ranking": "raw_scores_then_shared_evaluator_clip_to_[1,5]",
+    "Vanilla_GCN": "legacy_per_user_candidate_MinMax_to_[1,5]_then_shared_evaluator"
+  },
+  "execution_device": "cuda",
+  "gpu_name": "NVIDIA RTX A6000",
+  "reproducibility": {
+    "seed": 42,
+    "python_hash_seed": "42",
+    "deterministic_requested": true,
+    "cublas_workspace_config": ":4096:8",
+    "torch_available": true,
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true
+  },
+  "split_summaries": {
+    "42": {
+      "train": {
+        "ratings": 4845,
+        "users": 460,
+        "items": 151,
+        "density": 0.06975237546789519,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 30,
+          "mean": 10.532608695652174,
+          "median": 9.0,
+          "p25": 1.0,
+          "p75": 17.0
+        }
+      },
+      "validation": {
+        "ratings": 600,
+        "users": 458,
+        "items": 89,
+        "density": 0.008638065073423552,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.3100436681222707,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      },
+      "test": {
+        "ratings": 599,
+        "users": 458,
+        "items": 88,
+        "density": 0.00862366829830118,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.3078602620087336,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      }
+    },
+    "123": {
+      "train": {
+        "ratings": 4850,
+        "users": 460,
+        "items": 151,
+        "density": 0.06982435934350706,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 30,
+          "mean": 10.543478260869565,
+          "median": 9.0,
+          "p25": 1.0,
+          "p75": 17.0
+        }
+      },
+      "validation": {
+        "ratings": 597,
+        "users": 458,
+        "items": 88,
+        "density": 0.008594874748056435,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.3034934497816595,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      },
+      "test": {
+        "ratings": 597,
+        "users": 456,
+        "items": 87,
+        "density": 0.008594874748056435,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.3092105263157894,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      }
+    },
+    "2026": {
+      "train": {
+        "ratings": 4845,
+        "users": 460,
+        "items": 151,
+        "density": 0.06975237546789519,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 30,
+          "mean": 10.532608695652174,
+          "median": 9.0,
+          "p25": 1.0,
+          "p75": 17.0
+        }
+      },
+      "validation": {
+        "ratings": 600,
+        "users": 458,
+        "items": 87,
+        "density": 0.008638065073423552,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.3100436681222707,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      },
+      "test": {
+        "ratings": 599,
+        "users": 458,
+        "items": 92,
+        "density": 0.00862366829830118,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.3078602620087336,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      }
+    },
+    "3407": {
+      "train": {
+        "ratings": 4853,
+        "users": 460,
+        "items": 151,
+        "density": 0.06986754966887417,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 30,
+          "mean": 10.55,
+          "median": 9.0,
+          "p25": 1.0,
+          "p75": 17.0
+        }
+      },
+      "validation": {
+        "ratings": 595,
+        "users": 457,
+        "items": 81,
+        "density": 0.00856608119781169,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.301969365426696,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      },
+      "test": {
+        "ratings": 596,
+        "users": 456,
+        "items": 91,
+        "density": 0.008580477972934063,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.3070175438596492,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      }
+    },
+    "7777": {
+      "train": {
+        "ratings": 4845,
+        "users": 460,
+        "items": 151,
+        "density": 0.06975237546789519,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 30,
+          "mean": 10.532608695652174,
+          "median": 9.0,
+          "p25": 1.0,
+          "p75": 17.0
+        }
+      },
+      "validation": {
+        "ratings": 599,
+        "users": 458,
+        "items": 84,
+        "density": 0.00862366829830118,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.3078602620087336,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      },
+      "test": {
+        "ratings": 600,
+        "users": 458,
+        "items": 86,
+        "density": 0.008638065073423552,
+        "cold_start_users_vs_train": 0,
+        "cold_start_items_vs_train": 0,
+        "per_user_interactions": {
+          "min": 1,
+          "max": 3,
+          "mean": 1.3100436681222707,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0
+        }
+      }
+    }
+  },
+  "pairwise_counts_out_of_5": {
+    "MF_lower_RMSE_than_LightGCN_RMSE": 5,
+    "LightGCN_RMSE_higher_NDCG5_than_MF": 5,
+    "LightGCN_Ranking_higher_NDCG5_than_MF": 5,
+    "LightGCN_Ranking_worse_RMSE_than_MF": 5
+  },
+  "strongest_NDCG5_advantage_over_MF_in_1_to_10_bucket_count": {
+    "LightGCN_RMSE": 5,
+    "LightGCN_Ranking": 5,
+    "Vanilla_GCN": 5
+  },
+  "aggregate_std_ddof": 1,
+  "total_runtime_seconds": 26.52573369629681
+}
