@@ -1,0 +1,62 @@
+# Rule-based sparsity-aware LightGCN V1
+
+- Selected policy: **A_uniform** by validation NDCG@5
+- Fixed hyperparameters: `{'embedding_dim': 32, 'number_of_layers': 3, 'learning_rate': 0.01, 'epochs': 100, 'weight_decay': 0.0}`
+- GPU: NVIDIA RTX A6000
+- Total runtime: 7.880 seconds
+
+## Validation policy results
+
+| policy | training_loss | runtime_seconds | MAE | RMSE | Rating_Rows | Missing_Predictions | Fallback_Predictions | Cold_User_Rows | Cold_Item_Rows | Ranking_Eligible_Users | Precision@5 | Recall@5 | NDCG@5 | HitRate@5 | Precision@10 | Recall@10 | NDCG@10 | HitRate@10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| A_uniform | 1.1382927894592285 | 3.113010112196207 | 0.99022252202034 | 1.2898212136588794 | 600 | 0 | 0 | 0 | 0 | 170 | 0.19764705882352943 | 0.8333333333333333 | 0.6483511935413188 | 0.8764705882352941 | 0.10764705882352942 | 0.8892156862745098 | 0.6683044457852748 | 0.9117647058823529 |
+| B_mild | 1.262446403503418 | 1.2067119590938091 | 1.0704516398906707 | 1.4365283208989033 | 600 | 0 | 0 | 0 | 0 | 170 | 0.16941176470588235 | 0.7352941176470589 | 0.5800668654056766 | 0.7764705882352941 | 0.10235294117647058 | 0.85 | 0.6219030990671449 | 0.8823529411764706 |
+| C_stronger | 1.272740125656128 | 1.130178278312087 | 1.073768550356229 | 1.4420570995149324 | 600 | 0 | 0 | 0 | 0 | 170 | 0.1623529411764706 | 0.6980392156862745 | 0.5625506835298841 | 0.7470588235294118 | 0.10117647058823531 | 0.8411764705882353 | 0.6141404781335064 | 0.8764705882352941 |
+| D_hard_routing | 1.2095541954040527 | 1.177558708935976 | 1.048306657274564 | 1.4132101369786298 | 600 | 0 | 0 | 0 | 0 | 170 | 0.16 | 0.6901960784313725 | 0.5222242909137783 | 0.7352941176470589 | 0.10294117647058823 | 0.861764705882353 | 0.5818185769830405 | 0.9 |
+
+## Final test metrics
+
+| MAE | RMSE | Rating_Rows | Missing_Predictions | Fallback_Predictions | Cold_User_Rows | Cold_Item_Rows | Ranking_Eligible_Users | Precision@5 | Recall@5 | NDCG@5 | HitRate@5 | Precision@10 | Recall@10 | NDCG@10 | HitRate@10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1.0342828895094398 | 1.3612976301786803 | 599 | 0 | 0 | 0 | 0 | 185 | 0.1913513513513514 | 0.8441441441441441 | 0.6730360123568213 | 0.8864864864864865 | 0.10540540540540541 | 0.9117117117117116 | 0.6969946949040355 | 0.9459459459459459 |
+
+## Overall frozen-reference comparison
+
+| model | MAE | RMSE | Precision@5 | Precision@10 | Recall@5 | Recall@10 | NDCG@5 | NDCG@10 | HitRate@5 | HitRate@10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| V1_A_uniform | 1.0342828895094398 | 1.3612976301786803 | 0.1913513513513514 | 0.10540540540540541 | 0.8441441441441441 | 0.9117117117117116 | 0.6730360123568213 | 0.6969946949040355 | 0.8864864864864865 | 0.9459459459459459 |
+| MF | 0.8292689014953842 | 1.024343442925574 | 0.0627027027027027 | 0.0421621621621621 | 0.2612612612612612 | 0.3405405405405405 | 0.1937683492151804 | 0.2215967632746223 | 0.3027027027027027 | 0.372972972972973 |
+| LightGCN_RMSE | 0.869719359034887 | 1.1676030688807588 | 0.134054054054054 | 0.0854054054054054 | 0.6324324324324324 | 0.772972972972973 | 0.4473553639883973 | 0.4948806335682916 | 0.654054054054054 | 0.8216216216216217 |
+| LightGCN_Ranking | 1.0342828903054953 | 1.3612976370725998 | 0.1913513513513514 | 0.1054054054054054 | 0.8441441441441441 | 0.9117117117117116 | 0.6730360123568213 | 0.6969946949040355 | 0.8864864864864865 | 0.945945945945946 |
+
+## Test sparsity buckets and frozen references
+
+| model | train_interaction_bucket | users | rating_rows | ranking_eligible_users | MAE | RMSE | Precision@5 | Recall@5 | NDCG@5 | HitRate@5 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| A_uniform | 1-5 | 172 | 172 | 58 | 1.3513172241144402 | 1.7839069526024842 | 0.18965517241379304 | 0.9482758620689655 | 0.7457219504352259 | 0.9482758620689655 |
+| A_uniform | 6-10 | 93 | 93 | 25 | 0.9109379347934518 | 1.1568309398873888 | 0.19200000000000003 | 0.96 | 0.7661859507142915 | 0.96 |
+| A_uniform | 11-20 | 106 | 139 | 44 | 0.8715629483298432 | 1.1099626986054285 | 0.18636363636363634 | 0.8863636363636364 | 0.6810404381798223 | 0.8863636363636364 |
+| A_uniform | >20 | 87 | 195 | 58 | 0.9294585154606746 | 1.170048242559802 | 0.196551724137931 | 0.6580459770114943 | 0.5541269157413684 | 0.7931034482758621 |
+| MF | 1-5 | 172 | 172 | 58 | 1.0693175037239873 | 1.2277698972438542 | 0.027586206896551727 | 0.1379310344827586 | 0.1038572243842384 | 0.1379310344827586 |
+| MF | 6-10 | 93 | 93 | 25 | 0.7664597470273253 | 0.9280540459278324 | 0.05600000000000001 | 0.28 | 0.1871552992581888 | 0.28 |
+| MF | 11-20 | 106 | 139 | 44 | 0.7636777934410589 | 0.9756164146531072 | 0.07272727272727274 | 0.3522727272727273 | 0.2514737488701886 | 0.3636363636363636 |
+| MF | >20 | 87 | 195 | 58 | 0.69424354663262 | 0.8968289193739352 | 0.09310344827586207 | 0.3074712643678161 | 0.2427534165306814 | 0.4310344827586206 |
+| LightGCN_RMSE | 1-5 | 172 | 172 | 58 | 1.1442681031171666 | 1.5388077749622764 | 0.1689655172413793 | 0.8448275862068966 | 0.6032355972882703 | 0.8448275862068966 |
+| LightGCN_RMSE | 6-10 | 93 | 93 | 25 | 0.8195928309553413 | 1.0574909116301878 | 0.168 | 0.84 | 0.600640075360163 | 0.84 |
+| LightGCN_RMSE | 11-20 | 106 | 139 | 44 | 0.8056556398062398 | 1.0237658558817255 | 0.1681818181818182 | 0.7954545454545454 | 0.5389113587560538 | 0.7954545454545454 |
+| LightGCN_RMSE | >20 | 87 | 195 | 58 | 0.6971257185324644 | 0.9048158805133538 | 0.05862068965517242 | 0.2068965517241379 | 0.155947862514886 | 0.2758620689655172 |
+| LightGCN_Ranking | 1-5 | 172 | 172 | 58 | 1.3513172275798266 | 1.783906966409721 | 0.18965517241379304 | 0.9482758620689656 | 0.7457219504352259 | 0.9482758620689656 |
+| LightGCN_Ranking | 6-10 | 93 | 93 | 25 | 0.91093792710253 | 1.1568309315896563 | 0.19200000000000003 | 0.96 | 0.7661859507142915 | 0.96 |
+| LightGCN_Ranking | 11-20 | 106 | 139 | 44 | 0.8715629800618123 | 1.1099627332607382 | 0.18636363636363634 | 0.8863636363636364 | 0.6810404381798223 | 0.8863636363636364 |
+| LightGCN_Ranking | >20 | 87 | 195 | 58 | 0.9294584958981243 | 1.1700482291080008 | 0.196551724137931 | 0.6580459770114943 | 0.5541269157413684 | 0.7931034482758621 |
+
+Reference bucket Precision@5 was recovered from existing analysis artifacts; the LightGCN-Ranking reference equals selected A_uniform. No reference model was rerun.
+
+## Required conclusions
+
+1. **Validation NDCG@5 versus uniform:** change +0.000000; uniform is not outperformed.
+2. **Sparse-user ranking:** mean validation NDCG@5 change across 1–5 and 6–10 buckets is +0.000000 versus uniform. The selected V1 therefore provides no sparse-user gain over standard uniform LightGCN.
+3. **Dense-user degradation:** validation >20 NDCG@5 change is +0.000000 versus uniform. The selected V1 does not reduce dense-user degradation beyond the frozen ranking-oriented uniform baseline; its stronger dense ranking than LightGCN-RMSE is attributable to that existing uniform three-layer configuration, not sparsity-aware routing.
+4. **Rating impact:** validation MAE changes by +0.000000 and RMSE by +0.000000 versus uniform (lower is better).
+5. **Winning policy:** A_uniform, because it has the highest validation NDCG@5 among the four predefined policies.
+6. **V2 justification:** no. The validation NDCG@5 gain over uniform is +0.000000; all three non-uniform rules perform worse overall. V1 supplies no performance evidence that learnable routing is warranted, although V2 could still be studied under a separate hypothesis.

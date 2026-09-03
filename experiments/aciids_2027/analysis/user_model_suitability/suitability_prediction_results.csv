@@ -1,0 +1,62 @@
+record_type,model,feature,importance_type,importance,n_users,positive_lightgcn,negative_mf,cv_folds,accuracy,balanced_accuracy,roc_auc,precision,recall,f1,detail
+cv_performance,majority_class,,,,121,94.0,27.0,5.0,0.7768595041322314,0.5,0.5,0.7768595041322314,1.0,0.8744186046511628,out-of-fold predictions
+cv_performance,interaction_count_only,,,,121,94.0,27.0,5.0,0.8842975206611571,0.8067375886524822,0.882387706855792,0.9081632653061225,0.9468085106382979,0.9270833333333334,out-of-fold predictions
+fitted_feature_importance,interaction_count_only,train_interaction_count,standardized_logistic_coefficient,-1.871675477609886,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+cv_performance,logistic_all_features,,,,121,94.0,27.0,5.0,0.9008264462809917,0.8173758865248226,0.8553979511426321,0.91,0.9680851063829787,0.9381443298969072,out-of-fold predictions
+fitted_feature_importance,logistic_all_features,number_of_observed_ordered_pairs,standardized_logistic_coefficient,-0.6038913318008582,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_of_interactions_with_head_items,standardized_logistic_coefficient,0.5045528737904099,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,mean_degree_of_interacted_items,standardized_logistic_coefficient,0.47330901140890475,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,number_of_distinct_rating_levels,standardized_logistic_coefficient,-0.42271231933994863,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,rating_max,standardized_logistic_coefficient,-0.3592401692387954,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,min_degree_of_interacted_items,standardized_logistic_coefficient,-0.31303384696991104,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,train_interaction_count,standardized_logistic_coefficient,-0.3100518853756097,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_of_catalog_observed,standardized_logistic_coefficient,-0.3100518853756096,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_of_interactions_with_tail_items,standardized_logistic_coefficient,0.2538489229251388,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,mean_rating,standardized_logistic_coefficient,-0.2399405527857227,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_rating_lt_4,standardized_logistic_coefficient,0.23567981364385315,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_rating_ge_4,standardized_logistic_coefficient,-0.23567981364385304,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,max_degree_of_interacted_items,standardized_logistic_coefficient,-0.20466973535140065,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_rating_4,standardized_logistic_coefficient,-0.19125624816009829,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_rating_2,standardized_logistic_coefficient,0.18866437058080038,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_rating_1,standardized_logistic_coefficient,0.17481412780176478,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,median_degree_of_interacted_items,standardized_logistic_coefficient,-0.17377133429090008,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,rating_min,standardized_logistic_coefficient,-0.15089185228346055,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,normalized_pair_count_per_interaction,standardized_logistic_coefficient,-0.13036085906371056,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,rating_range,standardized_logistic_coefficient,-0.1223963450198798,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,max_rating_gap,standardized_logistic_coefficient,-0.1223963450198798,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_rating_5,standardized_logistic_coefficient,-0.09068830469161833,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_gap_1_pairs,standardized_logistic_coefficient,0.058963234852169366,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,rating_std,standardized_logistic_coefficient,0.03046472460208192,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_gap_2plus_pairs,standardized_logistic_coefficient,0.02636086777405585,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,rating_entropy,standardized_logistic_coefficient,-0.02216681357801978,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,fraction_rating_3,standardized_logistic_coefficient,0.006881260095177585,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,logistic_all_features,mean_rating_gap_across_pairs,standardized_logistic_coefficient,0.0056649460274263205,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+cv_performance,shallow_decision_tree,,,,121,94.0,27.0,5.0,0.7768595041322314,0.7639873916469662,0.8012214342001576,0.9135802469135802,0.7872340425531915,0.8457142857142858,out-of-fold predictions
+fitted_feature_importance,shallow_decision_tree,fraction_of_interactions_with_head_items,gini_importance,0.6673276297524644,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,rating_std,gini_importance,0.13080682155781537,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,mean_rating,gini_importance,0.09945321378557835,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_rating_5,gini_importance,0.05395904978471426,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_rating_4,gini_importance,0.048453285119427605,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,train_interaction_count,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_of_catalog_observed,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,rating_min,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,rating_max,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,number_of_distinct_rating_levels,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_rating_1,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_rating_2,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_rating_3,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_rating_ge_4,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_rating_lt_4,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,rating_entropy,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,rating_range,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,number_of_observed_ordered_pairs,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,normalized_pair_count_per_interaction,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,mean_rating_gap_across_pairs,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,max_rating_gap,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_gap_1_pairs,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_gap_2plus_pairs,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,mean_degree_of_interacted_items,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,median_degree_of_interacted_items,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,min_degree_of_interacted_items,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,max_degree_of_interacted_items,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only
+fitted_feature_importance,shallow_decision_tree,fraction_of_interactions_with_tail_items,gini_importance,0.0,121,,,,,,,,,,fit on full diagnostic sample; descriptive only

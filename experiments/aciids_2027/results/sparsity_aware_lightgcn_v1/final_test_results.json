@@ -1,0 +1,55 @@
+{
+  "selected_policy": "A_uniform",
+  "weights": {
+    "1-5": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+    ],
+    "6-10": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+    ],
+    "11-20": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+    ],
+    ">20": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+    ]
+  },
+  "test_evaluations": 1,
+  "training_loss": 1.138292908668518,
+  "runtime_seconds": 1.1575761996209621,
+  "score_calibration": {
+    "ranking": "raw_dot_product_no_scaling_or_clipping",
+    "rating_metrics": "raw_dot_product_then_shared_evaluator_clip_to_[1,5]",
+    "fitted_calibration": "none"
+  },
+  "metrics": {
+    "MAE": 1.0342828895094398,
+    "RMSE": 1.3612976301786803,
+    "Rating_Rows": 599,
+    "Missing_Predictions": 0,
+    "Fallback_Predictions": 0,
+    "Cold_User_Rows": 0,
+    "Cold_Item_Rows": 0,
+    "Ranking_Eligible_Users": 185,
+    "Precision@5": 0.1913513513513514,
+    "Recall@5": 0.8441441441441441,
+    "NDCG@5": 0.6730360123568213,
+    "HitRate@5": 0.8864864864864865,
+    "Precision@10": 0.10540540540540541,
+    "Recall@10": 0.9117117117117116,
+    "NDCG@10": 0.6969946949040355,
+    "HitRate@10": 0.9459459459459459
+  }
+}

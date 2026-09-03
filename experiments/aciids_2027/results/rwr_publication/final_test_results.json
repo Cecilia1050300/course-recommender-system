@@ -1,0 +1,133 @@
+{
+  "test_evaluations_per_variant": 1,
+  "selected_configs": {
+    "RWR_Binary": {
+      "restart_probability_c": 0.1,
+      "temperature": null,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 2.043170460081551,
+      "validation_RMSE": 2.44154760154942,
+      "validation_NDCG@5": 0.5807517416430856,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_c",
+        "smaller_temperature"
+      ]
+    },
+    "RWR_Linear": {
+      "restart_probability_c": 0.1,
+      "temperature": null,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 2.036098338135673,
+      "validation_RMSE": 2.4284079859320684,
+      "validation_NDCG@5": 0.5863768027088595,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_c",
+        "smaller_temperature"
+      ]
+    },
+    "RWR_Softmax": {
+      "restart_probability_c": 0.7,
+      "temperature": 0.3,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 1.9192063897724316,
+      "validation_RMSE": 2.307371459409245,
+      "validation_NDCG@5": 0.4711778256292208,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_c",
+        "smaller_temperature"
+      ]
+    }
+  },
+  "results": [
+    {
+      "Method": "RWR_Binary",
+      "restart_probability_c": 0.1,
+      "temperature": null,
+      "runtime_seconds": 3.158840972930193,
+      "MAE": 1.9818547607015833,
+      "RMSE": 2.38236731065666,
+      "Rating_Rows": 599,
+      "Missing_Predictions": 0,
+      "Fallback_Predictions": 0,
+      "Cold_User_Rows": 0,
+      "Cold_Item_Rows": 0,
+      "Ranking_Eligible_Users": 185,
+      "Precision@5": 0.17945945945945943,
+      "Recall@5": 0.7846846846846847,
+      "NDCG@5": 0.6137964233930299,
+      "HitRate@5": 0.8324324324324325,
+      "Precision@10": 0.10108108108108108,
+      "Recall@10": 0.8720720720720719,
+      "NDCG@10": 0.6425471892314243,
+      "HitRate@10": 0.9135135135135135,
+      "degenerate_minmax_users_all": 0,
+      "degenerate_minmax_users_evaluated": 0,
+      "rating_rows_using_degenerate_3": 0,
+      "shared_evaluator_fallback_rows": 0,
+      "mean_iterations": 157.0,
+      "max_iterations": 157,
+      "unconverged_users": 0
+    },
+    {
+      "Method": "RWR_Linear",
+      "restart_probability_c": 0.1,
+      "temperature": null,
+      "runtime_seconds": 3.1212567519396544,
+      "MAE": 1.9764587336881265,
+      "RMSE": 2.373983194929913,
+      "Rating_Rows": 599,
+      "Missing_Predictions": 0,
+      "Fallback_Predictions": 0,
+      "Cold_User_Rows": 0,
+      "Cold_Item_Rows": 0,
+      "Ranking_Eligible_Users": 185,
+      "Precision@5": 0.1827027027027027,
+      "Recall@5": 0.7981981981981983,
+      "NDCG@5": 0.6235876835692161,
+      "HitRate@5": 0.8486486486486486,
+      "Precision@10": 0.10162162162162162,
+      "Recall@10": 0.8774774774774774,
+      "NDCG@10": 0.6505181329880982,
+      "HitRate@10": 0.918918918918919,
+      "degenerate_minmax_users_all": 0,
+      "degenerate_minmax_users_evaluated": 0,
+      "rating_rows_using_degenerate_3": 0,
+      "shared_evaluator_fallback_rows": 0,
+      "mean_iterations": 157.0,
+      "max_iterations": 157,
+      "unconverged_users": 0
+    },
+    {
+      "Method": "RWR_Softmax",
+      "restart_probability_c": 0.7,
+      "temperature": 0.3,
+      "runtime_seconds": 1.7823520507663488,
+      "MAE": 1.8602806694964917,
+      "RMSE": 2.249383246731017,
+      "Rating_Rows": 599,
+      "Missing_Predictions": 0,
+      "Fallback_Predictions": 0,
+      "Cold_User_Rows": 0,
+      "Cold_Item_Rows": 0,
+      "Ranking_Eligible_Users": 185,
+      "Precision@5": 0.13189189189189188,
+      "Recall@5": 0.5531531531531532,
+      "NDCG@5": 0.4383346442599071,
+      "HitRate@5": 0.6,
+      "Precision@10": 0.0956756756756757,
+      "Recall@10": 0.8198198198198198,
+      "NDCG@10": 0.5249115482744598,
+      "HitRate@10": 0.8540540540540541,
+      "degenerate_minmax_users_all": 0,
+      "degenerate_minmax_users_evaluated": 0,
+      "rating_rows_using_degenerate_3": 0,
+      "shared_evaluator_fallback_rows": 0,
+      "mean_iterations": 14.847826086956522,
+      "max_iterations": 15,
+      "unconverged_users": 0
+    }
+  ]
+}

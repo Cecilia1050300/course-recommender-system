@@ -1,0 +1,73 @@
+{
+  "status": "FROZEN_BEFORE_TEST_LOAD",
+  "selection_data": "validation_only",
+  "test_loaded_at_write_time": false,
+  "selected": {
+    "User_Rating": {
+      "K": 9,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 0.9607802298359538,
+      "validation_RMSE": 1.2186285126414818,
+      "validation_NDCG@5": 0.0029922408404898636,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_K"
+      ]
+    },
+    "User_Content": {
+      "K": 9,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 1.0656368357176311,
+      "validation_RMSE": 1.2973118720986765,
+      "validation_NDCG@5": 0.002742208641606697,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_K"
+      ]
+    },
+    "User_Hybrid": {
+      "K": 9,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 0.9600509043575647,
+      "validation_RMSE": 1.2067688350615582,
+      "validation_NDCG@5": 0.007920553184475328,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_K"
+      ]
+    },
+    "Item_Rating": {
+      "K": 9,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 0.8793346722925096,
+      "validation_RMSE": 1.1588850591430273,
+      "validation_NDCG@5": 0.005066783036157566,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_K"
+      ]
+    },
+    "Item_Content": {
+      "K": 9,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 0.9036526757019286,
+      "validation_RMSE": 1.1817860564363911,
+      "validation_NDCG@5": 0.008511781416311752,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_K"
+      ]
+    },
+    "Item_Hybrid": {
+      "K": 7,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 0.8832720023111706,
+      "validation_RMSE": 1.1631196751598756,
+      "validation_NDCG@5": 0.19246772457792408,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_K"
+      ]
+    }
+  }
+}

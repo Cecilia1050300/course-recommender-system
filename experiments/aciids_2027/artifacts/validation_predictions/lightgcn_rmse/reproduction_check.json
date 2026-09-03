@@ -1,0 +1,90 @@
+{
+  "model": "lightgcn_rmse",
+  "status": "PASS",
+  "absolute_tolerance": 1e-07,
+  "maximum_metric_absolute_difference": 5.316073137251465e-09,
+  "metric_comparison": {
+    "MAE": {
+      "recovered": 0.8387105240424474,
+      "saved": 0.8387105266253153,
+      "absolute_difference": 2.582867919542764e-09
+    },
+    "RMSE": {
+      "recovered": 1.120470175393151,
+      "saved": 1.120470180709224,
+      "absolute_difference": 5.316073137251465e-09
+    },
+    "Precision@5": {
+      "recovered": 0.1411764705882353,
+      "saved": 0.1411764705882353,
+      "absolute_difference": 0.0
+    },
+    "Recall@5": {
+      "recovered": 0.6470588235294118,
+      "saved": 0.6470588235294118,
+      "absolute_difference": 0.0
+    },
+    "NDCG@5": {
+      "recovered": 0.45116858199324383,
+      "saved": 0.4511685819932438,
+      "absolute_difference": 5.551115123125783e-17
+    },
+    "HitRate@5": {
+      "recovered": 0.6764705882352942,
+      "saved": 0.6764705882352942,
+      "absolute_difference": 0.0
+    },
+    "Precision@10": {
+      "recovered": 0.08882352941176472,
+      "saved": 0.0888235294117647,
+      "absolute_difference": 1.3877787807814457e-17
+    },
+    "Recall@10": {
+      "recovered": 0.7794117647058824,
+      "saved": 0.7794117647058824,
+      "absolute_difference": 0.0
+    },
+    "NDCG@10": {
+      "recovered": 0.49657470674704396,
+      "saved": 0.4965747067470439,
+      "absolute_difference": 5.551115123125783e-17
+    },
+    "HitRate@10": {
+      "recovered": 0.8352941176470589,
+      "saved": 0.8352941176470589,
+      "absolute_difference": 0.0
+    }
+  },
+  "count_comparison": {
+    "Rating_Rows": {
+      "recovered": 600,
+      "saved": 600,
+      "difference": 0
+    },
+    "Missing_Predictions": {
+      "recovered": 0,
+      "saved": 0,
+      "difference": 0
+    },
+    "Fallback_Predictions": {
+      "recovered": 0,
+      "saved": 0,
+      "difference": 0
+    },
+    "Cold_User_Rows": {
+      "recovered": 0,
+      "saved": 0,
+      "difference": 0
+    },
+    "Cold_Item_Rows": {
+      "recovered": 0,
+      "saved": 0,
+      "difference": 0
+    },
+    "Ranking_Eligible_Users": {
+      "recovered": 170,
+      "saved": 170,
+      "difference": 0
+    }
+  }
+}

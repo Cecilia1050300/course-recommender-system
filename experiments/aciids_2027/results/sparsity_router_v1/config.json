@@ -1,0 +1,40 @@
+{
+  "experiment": "sparsity_router_v1",
+  "seed": 42,
+  "experts": {
+    "MF": "publication-selected",
+    "LightGCN": "RMSE-selected publication"
+  },
+  "models_retrained": false,
+  "new_inference": false,
+  "thresholds": [
+    3,
+    5,
+    7,
+    10,
+    15,
+    20
+  ],
+  "route": "LightGCN if TRAIN interaction count <= tau, else MF",
+  "selection_rule": "maximize validation NDCG@5 among threshold routers with RMSE <= 1.10 * Always-MF RMSE; ties: lower RMSE, then smaller tau",
+  "evaluation_policy": {
+    "rating_min": 1.0,
+    "rating_max": 5.0,
+    "relevant_threshold": 4.0,
+    "top_ks": [
+      5,
+      10
+    ],
+    "missing_prediction": "train_global_mean"
+  },
+  "test_artifacts_loaded": false,
+  "test_evaluations": 0,
+  "validation_artifact_hashes_sha256": {
+    "experiments/aciids_2027/artifacts/validation_predictions/lightgcn_rmse/validation_candidate_scores.csv": "ea17c8b26bce3dbd42089d444c9e9bc3f9180eab2eb659d099ce642a72e0bc53",
+    "experiments/aciids_2027/artifacts/validation_predictions/lightgcn_rmse/validation_per_user_metrics.csv": "d92056cb7026b423b1bbd9f022bd2dbd3fd8a3114862b145c7f9658b973e1560",
+    "experiments/aciids_2027/artifacts/validation_predictions/lightgcn_rmse/validation_predictions.csv": "41796476d20d4e51bcb179d80f7068dc5d1aeba39acb4a1dcfa00eb2cc361d74",
+    "experiments/aciids_2027/artifacts/validation_predictions/mf/validation_candidate_scores.csv": "c72a5a0dc639518be3cc136135e93df8254006beb7cf62ec6afe5640d2739cca",
+    "experiments/aciids_2027/artifacts/validation_predictions/mf/validation_per_user_metrics.csv": "cbe49b87b555428bdbd2d27e9406ccf26b3df0d574a5e9594f02494ba7d534e8",
+    "experiments/aciids_2027/artifacts/validation_predictions/mf/validation_predictions.csv": "f2d88dfbe798b3e1d7cfb8343067dcd3d71188b557dee97e9828c3ad75d10275"
+  }
+}

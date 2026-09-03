@@ -1,0 +1,20 @@
+{
+  "eligible_users": 314,
+  "total_pairs": 28076,
+  "gap_counts": {
+    "1": 16528,
+    "2": 8280,
+    "3": 2779,
+    "4": 489
+  },
+  "gap_percentages": {
+    "1": 58.868784727169114,
+    "2": 29.49138053853825,
+    "3": 9.898133637270266,
+    "4": 1.7417010970223679
+  },
+  "source": "/home/training/research/course-recommender-system/experiments/aciids_2027/splits/seed_42/train.csv",
+  "observed_only": true,
+  "unobserved_negative_sampling": false,
+  "matches_existing_feasibility_audit": true
+}

@@ -1,0 +1,14 @@
+Method,Total_Candidate_Scores,Finite_Score_Percent,Missing_Score_Percent,Fallback_Score_Percent,Users_Substantial_Ties,Users_Substantial_Ties_Percent,Mean_Unique_Scores_Per_User,Median_Unique_Scores_Per_User,Audit_Status,Similarity_All_Zero_Cases,Denominator_Zero_Cases,Note
+User_Rating,64317,100.0,0.0,25.962031811185224,0.0,0.0,87.79912663755458,87.0,AUDITED,16698.0,16698.0,substantial tie = largest exact-score group >=20% of candidates; CF scores regenerated exactly from frozen TRAIN/config
+User_Content,64317,100.0,0.0,62.417401309140665,0.0,0.0,84.22270742358079,84.0,AUDITED,40145.0,40145.0,substantial tie = largest exact-score group >=20% of candidates; CF scores regenerated exactly from frozen TRAIN/config
+User_Hybrid,64317,100.0,0.0,18.449243590341588,0.0,0.0,93.12227074235808,92.0,AUDITED,11866.0,11866.0,substantial tie = largest exact-score group >=20% of candidates; CF scores regenerated exactly from frozen TRAIN/config
+Item_Rating,64317,100.0,0.0,25.962031811185224,182.0,39.737991266375545,79.5764192139738,99.0,AUDITED,16698.0,16698.0,substantial tie = largest exact-score group >=20% of candidates; CF scores regenerated exactly from frozen TRAIN/config
+Item_Content,64317,100.0,0.0,0.0,458.0,100.0,57.209606986899566,89.0,AUDITED,0.0,0.0,substantial tie = largest exact-score group >=20% of candidates; CF scores regenerated exactly from frozen TRAIN/config
+Item_Hybrid,64317,100.0,0.0,0.0,147.0,32.096069868995635,88.78602620087337,123.0,AUDITED,0.0,0.0,substantial tie = largest exact-score group >=20% of candidates; CF scores regenerated exactly from frozen TRAIN/config
+RWR Binary,64317,100.0,0.0,0.0,0.0,0.0,131.46288209606988,133.0,AUDITED,0.0,0.0,substantial tie = largest exact-score group >=20% of candidates; raw RWR scores; no fallback
+RWR Linear,64317,100.0,0.0,0.0,0.0,0.0,139.43231441048036,141.0,AUDITED,0.0,0.0,substantial tie = largest exact-score group >=20% of candidates; raw RWR scores; no fallback
+RWR Softmax,64317,100.0,0.0,0.0,0.0,0.0,139.43231441048036,141.0,AUDITED,0.0,0.0,substantial tie = largest exact-score group >=20% of candidates; raw RWR scores; no fallback
+MF,64317,,,,,,,,UNAVAILABLE,,,publication artifact stores held-out scores only; no checkpoint/full matrix; retraining prohibited
+Vanilla GCN,64317,,,,,,,,UNAVAILABLE,,,publication artifact stores held-out scores only; no checkpoint/full matrix; retraining prohibited
+LightGCN-RMSE,64317,,,,,,,,UNAVAILABLE,,,publication artifact stores held-out scores only; no checkpoint/full matrix; retraining prohibited
+LightGCN-Ranking,64317,,,,,,,,UNAVAILABLE,,,publication artifact stores held-out scores only; no checkpoint/full matrix; retraining prohibited

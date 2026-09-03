@@ -1,0 +1,2 @@
+Student_ID,MF_MAE_user,LightGCN_MAE_user,MAE_difference,MF_NDCG5_user,LightGCN_NDCG5_user,NDCG5_difference,ranking_eligible,rating_winner,ranking_winner,MF_Recall@5,LightGCN_Recall@5,Recall@5_difference,MF_HitRate@5,LightGCN_HitRate@5,HitRate@5_difference,availability_status
+,,,,,,,,,,,,,,,,UNAVAILABLE: no saved per-user prediction or per-user metric artifact exists for the frozen LightGCN-ranking configuration; no inference rerun

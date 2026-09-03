@@ -1,0 +1,64 @@
+{
+  "experiment": "rwr_publication",
+  "seed": 42,
+  "variants": [
+    "RWR_Binary",
+    "RWR_Linear",
+    "RWR_Softmax"
+  ],
+  "restart_probability_grid": [
+    0.1,
+    0.2,
+    0.3,
+    0.35,
+    0.4,
+    0.5,
+    0.6,
+    0.7
+  ],
+  "softmax_temperature_grid": [
+    0.3,
+    0.5,
+    0.8,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "validation_configuration_count": 64,
+  "selection": "per variant: lowest validation RMSE; tie highest NDCG@5; tie smaller c; tie smaller temperature",
+  "test_evaluations_per_variant": 1,
+  "graph_fit_data": "TRAIN_only",
+  "rating_mapping_fit_data": "TRAIN graph and TRAIN-observed mask only",
+  "rating_mapping": "log(raw_rwr+1e-10), per-user MinMax over TRAIN-unobserved items to [1,5]; constant range -> 3",
+  "ranking_score": "raw_RWR_item_node_proximity",
+  "evaluation_policy": {
+    "rating_min": 1.0,
+    "rating_max": 5.0,
+    "relevant_threshold": 4.0,
+    "top_ks": [
+      5,
+      10
+    ],
+    "missing_prediction": "train_global_mean"
+  },
+  "reproducibility": {
+    "seed": 42,
+    "python_hash_seed": "42",
+    "deterministic_requested": true,
+    "cublas_workspace_config": ":4096:8",
+    "torch_available": true,
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true
+  },
+  "split_directory": "/home/training/research/course-recommender-system/experiments/aciids_2027/splits/seed_42",
+  "catalog_size": 151,
+  "runtime_seconds": 145.7132357303053,
+  "input_hashes_sha256": {
+    "experiments/aciids_2027/splits/seed_42/train.csv": "e2c65069051612f39f7a3320747a0c1311645cdb24dd7b131562ba293a80758d",
+    "experiments/aciids_2027/splits/seed_42/validation.csv": "15de9fdda7ce5114cc2be9118deb08df968211484524ee6fe1010a5ed646722a",
+    "experiments/aciids_2027/splits/seed_42/test.csv": "81b900b059a45ddff7acd5e2bb8765d4c32f0322438ed130fbbf703c0e083891",
+    "old/rating_matrix - rating_matrix.csv": "b29a40acf6ffac31f3e10603c3d27dc0dffe1c2debe46b8cfe3319b4c5a3ab4e",
+    "shared/evaluator.py": "e70a4ebb9c11af565df6d8df7d5062f0935c27bff7e173c0a8d9f7bcffa058ee",
+    "methods/rwr/RWR_experiment_ndcg.py": "a6f919f3283029f0d5bd8ba8e4df9d870fc262c24ca2fae8c84e9d29ffcde643"
+  }
+}

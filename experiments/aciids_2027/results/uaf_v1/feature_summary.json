@@ -1,0 +1,144 @@
+{
+  "definitions": {
+    "train_interaction_count": "number of TRAIN interactions",
+    "log1p_train_interaction_count": "natural log(1 + TRAIN interaction count)",
+    "train_rating_mean": "mean TRAIN rating",
+    "train_rating_std": "population standard deviation (ddof=0) of TRAIN ratings",
+    "train_rating_entropy": "natural-log Shannon entropy of empirical TRAIN rating levels",
+    "train_positive_ratio": "fraction of TRAIN ratings >= 4",
+    "mean_train_item_popularity": "mean TRAIN interaction degree of interacted items"
+  },
+  "feature_sets": {
+    "count_only": [
+      "log1p_train_interaction_count"
+    ],
+    "rich": [
+      "train_interaction_count",
+      "log1p_train_interaction_count",
+      "train_rating_mean",
+      "train_rating_std",
+      "train_rating_entropy",
+      "train_positive_ratio",
+      "mean_train_item_popularity"
+    ]
+  },
+  "standardization_population": "all users in TRAIN only",
+  "standardization": {
+    "UAF-count": {
+      "log1p_train_interaction_count": {
+        "mean": 2.0477916917732664,
+        "std": 0.9862634689999543,
+        "scale_used": 0.9862634689999543
+      }
+    },
+    "UAF-rich": {
+      "train_interaction_count": {
+        "mean": 10.532608695652174,
+        "std": 8.535413551729924,
+        "scale_used": 8.535413551729924
+      },
+      "log1p_train_interaction_count": {
+        "mean": 2.0477916917732664,
+        "std": 0.9862634689999543,
+        "scale_used": 0.9862634689999543
+      },
+      "train_rating_mean": {
+        "mean": 2.728281385173872,
+        "std": 1.1237629883896125,
+        "scale_used": 1.1237629883896125
+      },
+      "train_rating_std": {
+        "mean": 0.645973206653833,
+        "std": 0.48878332166986677,
+        "scale_used": 0.48878332166986677
+      },
+      "train_rating_entropy": {
+        "mean": 0.7771441022165766,
+        "std": 0.5778802508673074,
+        "scale_used": 0.5778802508673074
+      },
+      "train_positive_ratio": {
+        "mean": 0.34169105677357264,
+        "std": 0.3544025872491016,
+        "scale_used": 0.3544025872491016
+      },
+      "mean_train_item_popularity": {
+        "mean": 105.45586288701854,
+        "std": 30.77235222961236,
+        "scale_used": 30.77235222961236
+      }
+    }
+  },
+  "raw_summary": {
+    "train_interaction_count": {
+      "count": 460.0,
+      "mean": 10.532608695652174,
+      "std": 8.544706329171065,
+      "min": 1.0,
+      "25%": 1.0,
+      "50%": 9.0,
+      "75%": 17.0,
+      "max": 30.0
+    },
+    "log1p_train_interaction_count": {
+      "count": 460.0,
+      "mean": 2.0477916917732664,
+      "std": 0.9873372455498778,
+      "min": 0.6931471805599453,
+      "25%": 0.6931471805599453,
+      "50%": 2.302585092994046,
+      "75%": 2.8903717578961645,
+      "max": 3.4339872044851463
+    },
+    "train_rating_mean": {
+      "count": 460.0,
+      "mean": 2.728281385173872,
+      "std": 1.12498646505942,
+      "min": 1.0,
+      "25%": 1.8888888888888888,
+      "50%": 2.755,
+      "75%": 3.5875000000000004,
+      "max": 5.0
+    },
+    "train_rating_std": {
+      "count": 460.0,
+      "mean": 0.645973206653833,
+      "std": 0.48931547568884803,
+      "min": 0.0,
+      "25%": 0.0,
+      "50%": 0.8,
+      "75%": 1.0198039027185568,
+      "max": 1.699673171197595
+    },
+    "train_rating_entropy": {
+      "count": 460.0,
+      "mean": 0.7771441022165766,
+      "std": 0.5785094075597623,
+      "min": -0.0,
+      "25%": -0.0,
+      "50%": 1.0283941667143721,
+      "75%": 1.2798542258336674,
+      "max": 1.6020559154587264
+    },
+    "train_positive_ratio": {
+      "count": 460.0,
+      "mean": 0.34169105677357264,
+      "std": 0.35478843666904025,
+      "min": 0.0,
+      "25%": 0.0,
+      "50%": 0.2222222222222222,
+      "75%": 0.6,
+      "max": 1.0
+    },
+    "mean_train_item_popularity": {
+      "count": 460.0,
+      "mean": 105.45586288701854,
+      "std": 30.80585507266468,
+      "min": 15.0,
+      "25%": 80.68566176470588,
+      "50%": 105.16111111111111,
+      "75%": 132.0,
+      "max": 160.0
+    }
+  }
+}

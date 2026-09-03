@@ -1,0 +1,46 @@
+{
+  "purpose": "validation_artifact_recovery_only",
+  "model": "mf",
+  "frozen_publication_configuration": {
+    "latent_dim": 32,
+    "epochs": 100,
+    "learning_rate": 0.005,
+    "weight_decay": 0.001
+  },
+  "seed": 42,
+  "training_implementation": "experiments/aciids_2027/run_mf.py:fit_predict",
+  "reproducibility": {
+    "seed": 42,
+    "python_hash_seed": "42",
+    "deterministic_requested": true,
+    "cublas_workspace_config": ":4096:8",
+    "torch_available": true,
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true
+  },
+  "device": "cuda",
+  "gpu_name": "NVIDIA RTX A6000",
+  "evaluation_implementation": "shared/evaluator.py:evaluate_predictions",
+  "evaluation_policy": {
+    "rating_min": 1.0,
+    "rating_max": 5.0,
+    "relevant_threshold": 4.0,
+    "top_ks": [
+      5,
+      10
+    ],
+    "missing_prediction": "train_global_mean"
+  },
+  "rating_calibration": "shared evaluator clips raw scores to [1,5]",
+  "ranking_scores": "raw scores; no clipping or scaling",
+  "split": "/home/training/research/course-recommender-system/experiments/aciids_2027/splits/seed_42",
+  "validation_only": true,
+  "test_loaded": false,
+  "runtime_seconds": 2.3186801075935364,
+  "input_hashes_sha256": {
+    "train.csv": "e2c65069051612f39f7a3320747a0c1311645cdb24dd7b131562ba293a80758d",
+    "validation.csv": "15de9fdda7ce5114cc2be9118deb08df968211484524ee6fe1010a5ed646722a",
+    "shared/evaluator.py": "e70a4ebb9c11af565df6d8df7d5062f0935c27bff7e173c0a8d9f7bcffa058ee",
+    "shared/reproducibility.py": "234cb540dbdcc38195a3dae839c810750fa972079f1615901ae6d8620b35079f"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "status": "FROZEN_BEFORE_TEST_LOAD",
+  "selection_data": "validation_only",
+  "test_loaded_at_write_time": false,
+  "selected": {
+    "RWR_Binary": {
+      "restart_probability_c": 0.1,
+      "temperature": null,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 2.043170460081551,
+      "validation_RMSE": 2.44154760154942,
+      "validation_NDCG@5": 0.5807517416430856,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_c",
+        "smaller_temperature"
+      ]
+    },
+    "RWR_Linear": {
+      "restart_probability_c": 0.1,
+      "temperature": null,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 2.036098338135673,
+      "validation_RMSE": 2.4284079859320684,
+      "validation_NDCG@5": 0.5863768027088595,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_c",
+        "smaller_temperature"
+      ]
+    },
+    "RWR_Softmax": {
+      "restart_probability_c": 0.7,
+      "temperature": 0.3,
+      "selection_metric": "validation_RMSE",
+      "validation_MAE": 1.9192063897724316,
+      "validation_RMSE": 2.307371459409245,
+      "validation_NDCG@5": 0.4711778256292208,
+      "tie_breakers": [
+        "higher_validation_NDCG@5",
+        "smaller_c",
+        "smaller_temperature"
+      ]
+    }
+  }
+}

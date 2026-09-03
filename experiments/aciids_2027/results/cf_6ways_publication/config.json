@@ -1,0 +1,62 @@
+{
+  "experiment": "cf_6ways_publication",
+  "seed": 42,
+  "methods": [
+    "User_Rating",
+    "User_Content",
+    "User_Hybrid",
+    "Item_Rating",
+    "Item_Content",
+    "Item_Hybrid"
+  ],
+  "K_search": [
+    1,
+    3,
+    5,
+    7,
+    9
+  ],
+  "selection": "lowest validation RMSE; tie highest validation NDCG@5; tie smaller K",
+  "test_evaluations_per_selected_method": 1,
+  "similarity_fit_data": "TRAIN_only",
+  "fallback": [
+    "valid_CF_weighted_prediction",
+    "target_item_TRAIN_mean",
+    "user_TRAIN_mean",
+    "global_TRAIN_mean"
+  ],
+  "neighbor_tie_breaking": "similarity_descending_then_ID_ascending",
+  "ranking_tie_breaking": "score_descending_then_Course_ID_ascending_in_shared_evaluator",
+  "rating_calibration": "raw deterministic score clipped to [1,5] by shared evaluator",
+  "ranking_calibration": "raw deterministic score; no clipping/scaling/jitter",
+  "evaluation_policy": {
+    "rating_min": 1.0,
+    "rating_max": 5.0,
+    "relevant_threshold": 4.0,
+    "top_ks": [
+      5,
+      10
+    ],
+    "missing_prediction": "train_global_mean"
+  },
+  "reproducibility": {
+    "seed": 42,
+    "python_hash_seed": "42",
+    "deterministic_requested": true,
+    "cublas_workspace_config": ":4096:8",
+    "torch_available": true,
+    "torch_version": "2.6.0+cu124",
+    "cuda_available": true
+  },
+  "split_directory": "/home/training/research/course-recommender-system/experiments/aciids_2027/splits/seed_42",
+  "catalog_size": 151,
+  "runtime_seconds": 101.13227382488549,
+  "input_hashes_sha256": {
+    "experiments/aciids_2027/splits/seed_42/train.csv": "e2c65069051612f39f7a3320747a0c1311645cdb24dd7b131562ba293a80758d",
+    "experiments/aciids_2027/splits/seed_42/validation.csv": "15de9fdda7ce5114cc2be9118deb08df968211484524ee6fe1010a5ed646722a",
+    "experiments/aciids_2027/splits/seed_42/test.csv": "81b900b059a45ddff7acd5e2bb8765d4c32f0322438ed130fbbf703c0e083891",
+    "flattened.csv": "51db6f0ed252f0baadc504365719b35d275ca96e7a3ffb4d59b7664c70fcbcc0",
+    "item_content_100d.csv": "68f91634395c704b3dc7bd4854af480bdb1991945460f7f7bdf93714ee57d077",
+    "shared/evaluator.py": "e70a4ebb9c11af565df6d8df7d5062f0935c27bff7e173c0a8d9f7bcffa058ee"
+  }
+}

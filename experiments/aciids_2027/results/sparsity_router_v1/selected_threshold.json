@@ -1,0 +1,10 @@
+{
+  "status": "NO ELIGIBLE ROUTER",
+  "selected_tau": null,
+  "selection_data": "validation_only",
+  "rule": "maximize validation NDCG@5 among threshold routers with RMSE <= 1.10 * Always-MF RMSE; ties: lower RMSE, then smaller tau",
+  "always_mf_validation_rmse": 0.9928405117226581,
+  "rmse_eligibility_ceiling": 1.0921245628949239,
+  "eligible_thresholds": [],
+  "test_artifacts_loaded_at_write_time": false
+}
